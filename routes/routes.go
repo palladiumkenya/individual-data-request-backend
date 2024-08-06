@@ -8,5 +8,5 @@ import (
 func Handlers(router *gin.Engine) {
 	// Define routes here
 	router.GET("/api_health", controllers.GetApiHealth) // Test endpoint
-
+	router.POST("/send_mail", controllers.SendMail)     // Send test email
 }
