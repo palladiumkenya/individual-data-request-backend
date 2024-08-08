@@ -1,9 +1,10 @@
-package main
+package controllers
 
 import (
 	"fmt"
-	"individual-data-request-backend/internal/config"
-	"individual-data-request-backend/internal/db"
+	"github.com/gin-gonic/gin"
+	"github.com/palladiumkenya/individual-data-request-backend/internal/config"
+	"github.com/palladiumkenya/individual-data-request-backend/internal/db"
 	"io"
 	"log"
 	"net/http"
@@ -40,20 +41,8 @@ func pdfHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func main() {
-	//cwd, err := os.Getwd()
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//fmt.Println("Current Working Directory:", cwd)
-	//// Read the entire file content
-	//content, err := ioutil.ReadFile(cwd + "/supporting-documents/ethics-approval.pdf")
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
+func getpdf(c *gin.Context) {
 
-	// Print the content as a string
-	//fmt.Println(string(content))
 	http.HandleFunc("/pdf", pdfHandler)
 	fmt.Println("Serving on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

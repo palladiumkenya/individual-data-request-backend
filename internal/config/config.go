@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -19,8 +18,6 @@ func LoadConfig() Config {
 
 	// Read environment variables
 	database_url := os.Getenv("DATABASE_URL")
-
-	fmt.Println(database_url)
 
 	return Config{
 		DatabaseURL: database_url,

@@ -2,14 +2,13 @@ package db
 
 import (
 	"context"
-	"fmt"
+
 	"log"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 func Connect(connString string) (*pgxpool.Pool, error) {
-	fmt.Println(connString)
 	config, err := pgxpool.ParseConfig(connString)
 	if err != nil {
 		log.Fatalf("Unable to parse connection string: %v\n", err)
