@@ -11,5 +11,4 @@ func Handlers(router *gin.Engine) {
 	router.POST("/send_mail", controllers.SendMail)     // Send test email
 
 	router.GET("/requests", controllers.GetRequests) // get pdf
-	
 }
