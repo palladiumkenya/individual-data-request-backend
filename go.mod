@@ -7,8 +7,17 @@ require (
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/joho/godotenv v1.5.1
-	github.com/mailgun/mailgun-go/v4 v4.12.0
+	github.com/mailgun/mailgun-go/v4 v4.14.0
 
+)
+
+require (
+	github.com/jackc/pgx/v5 v5.5.5 // indirect
+	github.com/jackc/puddle/v2 v2.2.1 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
+	golang.org/x/sync v0.7.0 // indirect
+	gorm.io/gorm v1.25.11 // indirect
 )
 
 require (
@@ -52,5 +61,6 @@ require (
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gorm.io/driver/postgres v1.5.9
 
 )
