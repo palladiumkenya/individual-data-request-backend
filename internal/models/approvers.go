@@ -4,46 +4,25 @@ import (
 	"context"
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"gorm.io/gorm"
 )
 
 type Approvers struct {
-	ID            uuid.UUID `json:"Id"`
-	Email         string    `json:"email"`
-	Approver_Type string    `json:"approver_type"`
+	ID            uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
+	Email         string    `gorm:"size:100;unique;not null"`
+	Approver_Type string    `gorm:"size:100;unique;not null"`
 }
 
-func GetApproverByID(ctx context.Context, pool *pgxpool.Pool, ID int) (*Approvers, error) {
-	var approver Approvers
-	row := pool.QueryRow(ctx, "SELECT Id, email,approver_type FROM approvers WHERE id=$1", ID)
-	err := row.Scan(&approver.ID, &approver.Email, &approver.Approver_Type)
-	if err != nil {
-		return nil, err
-	}
-	return &approver, nil
+func GetApproversByID(DB *gorm.DB, Id uuid.UUID) (*Approvers, error) {
+	var approvers *Approvers
+	result := DB.First(&approvers, "id = ?", Id)
+	return approvers, result.Error
 }
 
-func GetApprovers(ctx context.Context, pool *pgxpool.Pool) ([]Approvers, error) {
-	rows, err := pool.Query(ctx, "SELECT \"Id\", email,approver_type FROM approvers")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var approvers []Approvers
-	for rows.Next() {
-		var approver Approvers
-		err := rows.Scan(&approver.ID, &approver.Email, &approver.Approver_Type)
-		if err != nil {
-			return nil, err
-		}
-		approvers = append(approvers, approver)
-	}
-
-	if rows.Err() != nil {
-		return nil, rows.Err()
-	}
-
-	return approvers, nil
+func GetApproverss(DB *gorm.DB) ([]Approvers, error) {
+	var approverss []Approvers
+	result := DB.Find(&approverss)
+	return approverss, result.Error
 }
 
 func CreateApprover(ctx context.Context, pool *pgxpool.Pool, approver *Approvers) error {

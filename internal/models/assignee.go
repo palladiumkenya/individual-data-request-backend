@@ -4,45 +4,24 @@ import (
 	"context"
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"gorm.io/gorm"
 )
 
 type Assignees struct {
-	ID    uuid.UUID `json:"Id"`
-	Email string    `json:"email"`
+	ID    uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
+	Email string    `gorm:"size:100;unique;not null"`
 }
 
-func GetAssigneeByID(ctx context.Context, pool *pgxpool.Pool, ID int) (*Assignees, error) {
-	var assignee Assignees
-	row := pool.QueryRow(ctx, "SELECT Id, email FROM assignees WHERE id=$1", ID)
-	err := row.Scan(&assignee.ID, &assignee.Email)
-	if err != nil {
-		return nil, err
-	}
-	return &assignee, nil
+func GetAssigneeByID(DB *gorm.DB, Id uuid.UUID) (*Assignees, error) {
+	var assignee *Assignees
+	result := DB.First(&assignee, "id = ?", Id)
+	return assignee, result.Error
 }
 
-func GetAssignees(ctx context.Context, pool *pgxpool.Pool) ([]Assignees, error) {
-	rows, err := pool.Query(ctx, "SELECT \"Id\", email FROM assignees")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
+func GetAssignees(DB *gorm.DB) ([]Assignees, error) {
 	var assignees []Assignees
-	for rows.Next() {
-		var assignee Assignees
-		err := rows.Scan(&assignee.ID, &assignee.Email)
-		if err != nil {
-			return nil, err
-		}
-		assignees = append(assignees, assignee)
-	}
-
-	if rows.Err() != nil {
-		return nil, rows.Err()
-	}
-
-	return assignees, nil
+	result := DB.Find(&assignees)
+	return assignees, result.Error
 }
 
 func CreateAssignee(ctx context.Context, pool *pgxpool.Pool, assignee *Assignees) error {

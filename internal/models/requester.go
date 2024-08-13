@@ -1,55 +1,34 @@
 package models
 
 import (
-	"context"
 	"github.com/gofrs/uuid"
-	"github.com/jackc/pgx/v4/pgxpool"
+	"gorm.io/gorm"
 )
 
 type Requesters struct {
-	ID    uuid.UUID `json:"Id"`
-	Email string    `json:"email"`
+	ID           uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
+	Email        string    `gorm:"size:100;unique;not null"`
+	Name         string    `gorm:"size:100;unique"`
+	Organization string    `gorm:"size:100;unique"`
 }
 
-func GetRequesterByID(ctx context.Context, pool *pgxpool.Pool, ID int) (*Requesters, error) {
-	var requester Requesters
-	row := pool.QueryRow(ctx, "SELECT Id, email FROM requesters WHERE id=$1", ID)
-	err := row.Scan(&requester.ID, &requester.Email)
-	if err != nil {
-		return nil, err
-	}
-	return &requester, nil
+func GetRequesterByID(DB *gorm.DB, Id uuid.UUID) (*Requesters, error) {
+	var requester *Requesters
+	result := DB.First(&requester, "id = ?", Id)
+	return requester, result.Error
 }
 
-func GetRequesters(ctx context.Context, pool *pgxpool.Pool) ([]Requesters, error) {
-	rows, err := pool.Query(ctx, "SELECT \"Id\", email FROM requesters")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
+func GetRequesters(DB *gorm.DB) ([]Requesters, error) {
 	var requesters []Requesters
-	for rows.Next() {
-		var requester Requesters
-		err := rows.Scan(&requester.ID, &requester.Email)
-		if err != nil {
-			return nil, err
-		}
-		requesters = append(requesters, requester)
-	}
-
-	if rows.Err() != nil {
-		return nil, rows.Err()
-	}
-
-	return requesters, nil
+	result := DB.Find(&requesters)
+	return requesters, result.Error
 }
 
-func CreateRequester(ctx context.Context, pool *pgxpool.Pool, requester *Requesters) error {
-	_, err := pool.Exec(ctx, "INSERT INTO Requesters (email) VALUES ($1)",
-		requester.Email)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+//func CreateRequester(ctx context.Context, pool *pgxpool.Pool, requester *Requesters) error {
+//	_, err := pool.Exec(ctx, "INSERT INTO Requesters (email) VALUES ($1)",
+//		requester.Email)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
