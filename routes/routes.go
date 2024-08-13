@@ -10,6 +10,8 @@ func Handlers(router *gin.Engine) {
 	router.GET("/api_health", controllers.GetApiHealth) // Test endpoint
 	router.POST("/send_mail", controllers.SendMail)     // Send test email
 
-	router.GET("/requests", controllers.GetRequests) // get pdf
+	router.GET("/requests", controllers.GetRequests)                      // get requests
+	router.GET("/internal_approval/:id", controllers.GetInternalApproval) // get approval page data
+	router.POST("/internal_approval/action", controllers.ApproverAction)  // approve or reject requests
 
 }
