@@ -3,7 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/palladiumkenya/individual-data-request-backend/internal/config"
+	// "github.com/palladiumkenya/individual-data-request-backend/internal/config"
 	"github.com/palladiumkenya/individual-data-request-backend/internal/db"
 	"io"
 	"log"
@@ -12,8 +12,8 @@ import (
 )
 
 func pdfHandler(w http.ResponseWriter, r *http.Request) {
-	cfg := config.LoadConfig()
-	db.Connect(cfg.DatabaseURL)
+	// cfg := config.LoadConfig()
+	db.Connect()
 	// Define the path to the local PDF file
 	cwd, err := os.Getwd()
 	if err != nil {
