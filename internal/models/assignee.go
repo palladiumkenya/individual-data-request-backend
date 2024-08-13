@@ -2,7 +2,7 @@ package models
 
 import (
 	"context"
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"gorm.io/gorm"
 )

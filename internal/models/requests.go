@@ -21,6 +21,7 @@ type Requests struct {
 	Requestor_id   uuid.UUID  `gorm:"type:uuid"`
 	Requester      Requesters `gorm:"foreignKey:Requestor_id"`
 	Assignee_id    uuid.UUID  `gorm:"type:uuid"`
+	Assignee       Assignees  `gorm:"foreignKey:Assignee_id"`
 	Created_Date   time.Time  `gorm:"type:date"`
 }
 
