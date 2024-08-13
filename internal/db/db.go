@@ -1,48 +1,50 @@
 package db
 
 import (
-	"context"
-	"log"
-
+	"github.com/palladiumkenya/individual-data-request-backend/internal/config"
+	"github.com/palladiumkenya/individual-data-request-backend/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-
-	"github.com/jackc/pgx/v4/pgxpool"
+	"log"
 )
 
-func Connect(connString string) (*pgxpool.Pool, error) {
-	config, err := pgxpool.ParseConfig(connString)
+// var DB *gorm.DB
+var DB *gorm.DB
+
+func Connect() (*gorm.DB, error) {
+	cfg := config.LoadConfig()
+
+	DB, err := gorm.Open(postgres.Open(cfg.DatabaseURL), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("Unable to parse connection string: %v\n", err)
-		return nil, err
+		log.Fatalf("failed to connect database: %v", err)
 	}
 
-	pool, err := pgxpool.ConnectConfig(context.Background(), config)
-	if err != nil {
-		log.Fatalf("Unable to connect to database: %v\n", err)
-		return nil, err
-	}
-
-	return pool, nil
+	//return db, nil
+	return DB, nil
 }
 
-func GormConnect(connString string) (*gorm.DB, error) {
-	db, err := gorm.Open(postgres.Open(connString), &gorm.Config{})
+func MigrateDB() (*gorm.DB, error) {
+	cfg := config.LoadConfig()
+
+	//=========== migrate db
+	DB, err := gorm.Open(postgres.Open(cfg.DatabaseURL), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("Unable to connect to database: %v\n", err)
-		return nil, err
+		log.Fatalf("failed to connect database: %v", err)
 	}
 
-	sqlDB, err := db.DB()
+	// Migrate the schema
+	err = DB.AutoMigrate(&models.Requesters{}, &models.Requests{}, &models.Assignees{}, &models.Approvals{}, &models.Approvers{})
 	if err != nil {
-		log.Fatalf("Unable to get generic database object from GORM: %v\n", err)
-		return nil, err
+		log.Fatalf("failed to migrate database: %v", err)
 	}
 
-	// Optional: You can configure the database connection pool here.
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(100)
-	sqlDB.SetConnMaxLifetime(0)
+	// Create
+	//DB.Create(&models.Requests{Summery: "need this moh request sorted asap",
+	//	Status: "pending", Date_Due: time.Date(2024, 10, 10, 0, 0, 0, 0, time.UTC),
+	//	Priority_level: "high", Requestor_id: uuid.MustParse("88f75fd1-67b7-411c-8c9e-311afd5cf1eb"),
+	//	Assignee_id: uuid.MustParse("00000000-0000-0000-0000-000000000000"), Created_Date: time.Date(2024, 8, 10, 0, 0, 0, 0, time.UTC)})
+	// ==========migrate db
 
-	return db, nil
+	//return db, nil
+	return DB, nil
 }
