@@ -7,7 +7,6 @@ import (
 type Review struct {
 	ID             uint   `gorm:"primaryKey"`
 	Content        string `gorm:"type:text;not null"`
-	Rating         int    `gorm:"not null"`
 	UserID         uint   `gorm:"not null"`
 	ReviewerID     uint   `gorm:"not null"`
 	ReviewThreadID uint   `gorm:"not null"`
@@ -19,7 +18,7 @@ type ReviewThread struct {
 	ID        uint   `gorm:"primaryKey"`
 	Title     string `gorm:"not null"`
 	UserID    uint   `gorm:"not null"`
+	RequestID uint   `gorm:"not null"`
 	CreatedAt time.Time
-	UpdatedAt time.Time
 	Reviews   []Review `gorm:"foreignKey:ReviewThreadID"`
 }
