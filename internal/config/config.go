@@ -1,9 +1,11 @@
 package config
 
 import (
-	"github.com/joho/godotenv"
+	"fmt"
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -16,10 +18,12 @@ func LoadConfig() Config {
 		log.Fatalf("Error loading .env file")
 	}
 
-	// Read environment variables
-	database_url := os.Getenv("DATABASE_URL")
-
+	databaseURL := os.Getenv("DATABASE_URL")
+	if databaseURL == "" {
+		log.Fatalf("DATABASE_URL is not set in the environment variables")
+	}
+	fmt.Printf("Database URL: %s\n", databaseURL)
 	return Config{
-		DatabaseURL: database_url,
+		DatabaseURL: databaseURL,
 	}
 }
