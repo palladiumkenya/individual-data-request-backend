@@ -12,4 +12,6 @@ func Handlers(router *gin.Engine) {
 
 	router.GET("/requests", controllers.GetRequests) // get pdf
 	router.POST("/new_review_thread", controllers.CreateReviewThread) // create review thread
+	router.POST("/add_review", controllers.AddReview) // add review
+	router.GET("/get_reviews/:thread_id", controllers.GetReviewsForThread) // get reviews
 }
