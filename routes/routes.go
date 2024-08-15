@@ -12,4 +12,6 @@ func Handlers(router *gin.Engine) {
 
 	router.GET("/requests", controllers.GetRequests) // get pdf
 
+	router.POST("/upload", controllers.UploadFile)
+
 }
