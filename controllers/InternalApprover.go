@@ -35,8 +35,8 @@ func GetInternalApproval(c *gin.Context) {
 	ID := c.Param("id")
 	DB, err := db.Connect()
 
-	// Retrieve a requests
-	requests, err := models.GetRequestByID(DB, uuid.MustParse(ID))
+	// Retrieve a request
+	requests, err := models.GetApprovalByID(DB, uuid.MustParse(ID))
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// Return 404 if not found

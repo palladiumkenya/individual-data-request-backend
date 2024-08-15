@@ -12,7 +12,7 @@ import (
 
 type Requests struct {
 	ID             uuid.UUID  `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
-	Request_id     int        `gorm:"type:integer;unique;not null"`
+	ReqId          int        `gorm:"type:integer;unique;not null"`
 	Summery        string     `gorm:"size:500;not null"`
 	Status         string     `gorm:"size:100;not null"`
 	Date_Due       time.Time  `gorm:"type:date"`

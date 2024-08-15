@@ -8,7 +8,6 @@ import (
 	"log"
 )
 
-// var DB *gorm.DB
 var DB *gorm.DB
 
 func Connect() (*gorm.DB, error) {
@@ -39,10 +38,16 @@ func MigrateDB() (*gorm.DB, error) {
 	}
 
 	// Create
+	//DB.Create(&models.Requesters{ID: uuid.MustParse("88f75fd1-67b7-411c-8c9e-311afd5cf1eb"),
+	//	Email: "mary.kilewe@thepalladiumgoup.com", Name: "Kevin Kamau",
+	//	Organization: "CIHEB CONNECT"})
+	//DB.Create(&models.Assignees{ID: uuid.MustParse("44f75fd1-67b7-411c-8c9e-311afd5cf1eb"),
+	//	Email: "aden.mi15@gmail.com"})
+
 	//DB.Create(&models.Requests{Summery: "need this moh request sorted asap",
 	//	Status: "pending", Date_Due: time.Date(2024, 10, 10, 0, 0, 0, 0, time.UTC),
 	//	Priority_level: "high", Requestor_id: uuid.MustParse("88f75fd1-67b7-411c-8c9e-311afd5cf1eb"),
-	//	Assignee_id: uuid.MustParse("00000000-0000-0000-0000-000000000000"), Created_Date: time.Date(2024, 8, 10, 0, 0, 0, 0, time.UTC)})
+	//	Created_Date: time.Date(2024, 8, 10, 0, 0, 0, 0, time.UTC)})
 	// ==========migrate db
 
 	//return db, nil
