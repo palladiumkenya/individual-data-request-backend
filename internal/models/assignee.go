@@ -2,14 +2,14 @@ package models
 
 import (
 	"context"
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"gorm.io/gorm"
 )
 
 type Assignees struct {
 	ID    uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
-	Email string    `gorm:"size:100;unique;not null"`
+	Email string    `gorm:"size:100;not null"`
 }
 
 func GetAssigneeByID(DB *gorm.DB, Id uuid.UUID) (*Assignees, error) {
