@@ -1,15 +1,15 @@
 package models
 
 import (
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type Requesters struct {
 	ID           uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
-	Email        string    `gorm:"size:100;unique;not null"`
-	Name         string    `gorm:"size:100;unique"`
-	Organization string    `gorm:"size:100;unique"`
+	Email        string    `gorm:"size:100;not null"`
+	Name         string    `gorm:"size:100"`
+	Organization string    `gorm:"size:100"`
 }
 
 func GetRequesterByID(DB *gorm.DB, Id uuid.UUID) (*Requesters, error) {
