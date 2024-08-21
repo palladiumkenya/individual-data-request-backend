@@ -33,10 +33,40 @@ func GetRequests(c *gin.Context) {
 
 func GetInternalApproval(c *gin.Context) {
 	ID := c.Param("id")
+
 	DB, err := db.Connect()
 
 	// Retrieve a request
 	requests, err := models.GetApprovalByID(DB, uuid.MustParse(ID))
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// Return 404 if not found
+			c.JSON(http.StatusNotFound, gin.H{"error": "Request not found"})
+			return
+		}
+		// Handle other potential errors
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	fmt.Printf("Retrieved requests: %+v\n", requests)
+
+	// Set the Content-Type header and write the JSON response
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   requests,
+	})
+
+}
+
+func GetApproval(c *gin.Context) {
+	ID := c.Param("id")
+	approvalType := c.Param("type")
+
+	DB, err := db.Connect()
+
+	// Retrieve a request
+	requests, err := models.GetApprovalByIDAndType(DB, uuid.MustParse(ID), approvalType)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// Return 404 if not found
