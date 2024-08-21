@@ -8,9 +8,9 @@ import (
 
 type Approvals struct {
 	ID            uuid.UUID  `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
-	Comments      string     `gorm:"size:500;not null"`
+	Comments      string     `gorm:"size:500;null"`
 	Approver_type string     `gorm:"size:100;not null"`
-	Approved      bool       `gorm:"bool"`
+	Approved      *bool      `gorm:"bool;default:null"`
 	Requestor_id  uuid.UUID  `gorm:"type:uuid"`
 	Requester     Requesters `gorm:"foreignKey:Requestor_id"`
 	Request_id    uuid.UUID  `gorm:"type:uuid"`
@@ -20,9 +20,21 @@ type Approvals struct {
 	Approval_Date time.Time  `gorm:"type:date"`
 }
 
+//func GetApprovalByID(DB *gorm.DB, Id uuid.UUID) (*Approvals, error) {
+//	var approval *Approvals
+//	result := DB.Preload("Requester").Preload("Request").Preload("Approver").First(&approval, "request_id = ?", Id)
+//	return approval, result.Error
+//}
+
 func GetApprovalByID(DB *gorm.DB, Id uuid.UUID) (*Approvals, error) {
 	var approval *Approvals
 	result := DB.Preload("Requester").Preload("Request").Preload("Approver").First(&approval, "request_id = ?", Id)
+	return approval, result.Error
+}
+
+func GetApprovalByIDAndType(DB *gorm.DB, Id uuid.UUID, approvalType string) (*Approvals, error) {
+	var approval *Approvals
+	result := DB.Preload("Requester").Preload("Request").Preload("Approver").First(&approval, "request_id = ? and approver_type=?", Id, approvalType)
 	return approval, result.Error
 }
 
@@ -41,11 +53,15 @@ func CreateApproval(DB *gorm.DB, approvalData *Approvals) (*Approvals, error) {
 	var request *Requests
 	DB.First(&request, "id = ?", approvalData.Request_id)
 
-	if approvalData.Approved == true {
+	if isApproved(approvalData.Approved) {
 		request.Status = "approved"
-	} else if approvalData.Approved == false {
+	} else {
 		request.Status = "rejected"
 	}
 	DB.Save(&request)
 	return approval, result.Error
+}
+
+func isApproved(approved *bool) bool {
+	return approved != nil && *approved
 }
