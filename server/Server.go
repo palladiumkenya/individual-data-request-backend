@@ -1,10 +1,11 @@
 package server
 
 import (
-	"github.com/gin-contrib/cors"
-	"github.com/palladiumkenya/individual-data-request-backend/internal/db"
 	"log"
 	"time"
+
+	"github.com/gin-contrib/cors"
+	"github.com/palladiumkenya/individual-data-request-backend/internal/db"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -38,5 +39,5 @@ func Run() {
 	}
 
 	// Start server on port 8080
-	router.Run(":8080")
+	router.Run(`:8080`)
 }

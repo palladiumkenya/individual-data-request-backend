@@ -1,24 +1,28 @@
 package models
 
 import (
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"time"
 )
 
 type Approvals struct {
-	ID            uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
-	Comments      string    `gorm:"size:100;unique;not null"`
-	Approver_type string    `gorm:"size:100;unique;not null"`
-	Approved      bool      `gorm:"bool"`
-	Requestor_id  uuid.UUID `gorm:"type:uuid"`
-	Assignee_id   uuid.UUID `gorm:"type:uuid"`
-	Approval_Date time.Time `gorm:"type:date"`
+	ID            uuid.UUID  `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
+	Comments      string     `gorm:"size:500;not null"`
+	Approver_type string     `gorm:"size:100;not null"`
+	Approved      bool       `gorm:"bool"`
+	Requestor_id  uuid.UUID  `gorm:"type:uuid"`
+	Requester     Requesters `gorm:"foreignKey:Requestor_id"`
+	Request_id    uuid.UUID  `gorm:"type:uuid"`
+	Request       Requests   `gorm:"foreignKey:Request_id"`
+	Approver_id   uuid.UUID  `gorm:"type:uuid"`
+	Approver      Approvers  `gorm:"foreignKey:Approver_id"`
+	Approval_Date time.Time  `gorm:"type:date"`
 }
 
 func GetApprovalByID(DB *gorm.DB, Id uuid.UUID) (*Approvals, error) {
 	var approval *Approvals
-	result := DB.First(&approval, "id = ?", Id)
+	result := DB.Preload("Requester").Preload("Request").Preload("Approver").First(&approval, "request_id = ?", Id)
 	return approval, result.Error
 }
 
@@ -28,13 +32,20 @@ func GetApprovals(DB *gorm.DB) ([]Approvals, error) {
 	return approvals, result.Error
 }
 
-//func CreateApproval(DB *gorm.DB, approval *Approvals) error {
-//	_, err := pool.Exec(ctx, "INSERT INTO Approvals (comments, approved, requestor_id, approver_id) VALUES ($1, $2, $3, $4)",
-//		approval.Comments, approval.Approved, approval.Requestor_id, approval.Assignee_id)
-//	DB.Create(&Approvals{approval.Comments, approval.Approved, approval.Requestor_id, approval.Assignee_id})
-//
-//	if err != nil {
-//		return err
-//	}
-//	return nil
-//}
+func CreateApproval(DB *gorm.DB, approvalData *Approvals) (*Approvals, error) {
+	var approval *Approvals
+
+	result := DB.Create(&Approvals{Comments: approvalData.Comments, Approver_type: approvalData.Approver_type, Approved: approvalData.Approved,
+		Requestor_id: approvalData.Requestor_id, Request_id: approvalData.Request_id, Approval_Date: approvalData.Approval_Date})
+
+	var request *Requests
+	DB.First(&request, "id = ?", approvalData.Request_id)
+
+	if approvalData.Approved == true {
+		request.Status = "approved"
+	} else if approvalData.Approved == false {
+		request.Status = "rejected"
+	}
+	DB.Save(&request)
+	return approval, result.Error
+}

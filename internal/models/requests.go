@@ -3,7 +3,6 @@ package models
 import (
 	"context"
 	"github.com/google/uuid"
-	"github.com/jackc/pgtype"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"gorm.io/gorm"
 
@@ -13,14 +12,15 @@ import (
 
 type Requests struct {
 	ID             uuid.UUID  `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
-	Request_id     int        `gorm:"type:integer;unique;not null"`
-	Summery        string     `gorm:"size:500;unique;not null"`
-	Status         string     `gorm:"size:100;unique;not null"`
+	ReqId          int        `gorm:"type:integer;unique;not null"`
+	Summery        string     `gorm:"size:500;not null"`
+	Status         string     `gorm:"size:100;not null"`
 	Date_Due       time.Time  `gorm:"type:date"`
 	Priority_level string     `gorm:"size:100;unique;not null"`
 	Requestor_id   uuid.UUID  `gorm:"type:uuid"`
 	Requester      Requesters `gorm:"foreignKey:Requestor_id"`
-	Assignee_id    uuid.UUID  `gorm:"type:uuid"`
+	Assignee_id    uuid.UUID  `gorm:"type:uuid;null"`
+	Assignee       Assignees  `gorm:"foreignKey:Assignee_id"`
 	Created_Date   time.Time  `gorm:"type:date"`
 }
 
@@ -47,25 +47,6 @@ func CreateRequest(ctx context.Context, pool *pgxpool.Pool, request *Requests) e
 		request.Summery, request.Status, request.Date_Due, request.Priority_level)
 	if err != nil {
 		return err
-	}
-	return nil
-}
-
-func GetAssigneeTasks(db *gorm.DB, assigneeID uuid.UUID) ([]Requests, error) {
-	var assigneesTasks []Requests
-	result := db.Where("assignee_id = ?", assigneeID).Find(&assigneesTasks)
-	return assigneesTasks, result.Error
-}
-
-func UpdateTaskStatus(db *gorm.DB, taskID uuid.UUID, newStatus string) error {
-	result := db.Model(&Requests{}).Where("id = ?", taskID).Update("status", newStatus)
-	return result.Error
-}
-
-func convertPgDateToTime(pgDate pgtype.Date) *time.Time {
-	if pgDate.Status == pgtype.Present {
-		t := pgDate.Time
-		return &t
 	}
 	return nil
 }

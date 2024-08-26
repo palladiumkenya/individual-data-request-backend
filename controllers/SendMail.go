@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/palladiumkenya/individual-data-request-backend/models"
+	"github.com/palladiumkenya/individual-data-request-backend/internal/models"
 	"github.com/palladiumkenya/individual-data-request-backend/services"
 )
 
