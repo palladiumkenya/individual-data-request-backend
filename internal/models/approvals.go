@@ -20,11 +20,11 @@ type Approvals struct {
 	Approval_Date time.Time  `gorm:"type:date"`
 }
 
-//func GetApprovalByID(DB *gorm.DB, Id uuid.UUID) (*Approvals, error) {
-//	var approval *Approvals
-//	result := DB.Preload("Requester").Preload("Request").Preload("Approver").First(&approval, "request_id = ?", Id)
-//	return approval, result.Error
-//}
+func GetApprovalsByType(DB *gorm.DB, ApproveType string) ([]Approvals, error) {
+	var approvals []Approvals
+	result := DB.Preload("Requester").Preload("Request").Preload("Approver").Find(&approvals, "Approver_type = ?", ApproveType)
+	return approvals, result.Error
+}
 
 func GetApprovalByID(DB *gorm.DB, Id uuid.UUID) (*Approvals, error) {
 	var approval *Approvals
@@ -36,6 +36,23 @@ func GetApprovalByIDAndType(DB *gorm.DB, Id uuid.UUID, approvalType string) (*Ap
 	var approval *Approvals
 	result := DB.Preload("Requester").Preload("Request").Preload("Approver").First(&approval, "request_id = ? and approver_type=?", Id, approvalType)
 	return approval, result.Error
+}
+
+type Result struct {
+	PriorityLevel string
+	Count         int64
+}
+
+func GetApprovalsCounts(DB *gorm.DB, approvalType string) ([]Result, error) {
+	var results []Result
+	result := DB.Model(&Approvals{}).
+		Select("requests.priority_level, COUNT(*) as count").
+		Joins("LEFT JOIN requests ON approvals.request_id = requests.id").
+		Where("approvals.approver_type = ?", approvalType).
+		Group("requests.priority_level").
+		Scan(&results)
+
+	return results, result.Error
 }
 
 func GetApprovals(DB *gorm.DB) ([]Approvals, error) {
