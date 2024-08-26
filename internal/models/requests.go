@@ -51,6 +51,17 @@ func CreateRequest(ctx context.Context, pool *pgxpool.Pool, request *Requests) e
 	return nil
 }
 
+func GetAssigneeTasks(db *gorm.DB, assigneeID uuid.UUID) ([]Requests, error) {
+	var assigneesTasks []Requests
+	result := db.Where("assignee_id = ?", assigneeID).Find(&assigneesTasks)
+	return assigneesTasks, result.Error
+}
+
+func UpdateTaskStatus(db *gorm.DB, taskID uuid.UUID, newStatus string) error {
+	result := db.Model(&Requests{}).Where("id = ?", taskID).Update("status", newStatus)
+	return result.Error
+}
+
 func convertPgDateToTime(pgDate pgtype.Date) *time.Time {
 	if pgDate.Status == pgtype.Present {
 		t := pgDate.Time
