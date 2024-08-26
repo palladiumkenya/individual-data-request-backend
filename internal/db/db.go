@@ -8,7 +8,6 @@ import (
 	"log"
 )
 
-// var DB *gorm.DB
 var DB *gorm.DB
 
 func Connect() (*gorm.DB, error) {

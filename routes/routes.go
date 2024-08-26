@@ -13,6 +13,7 @@ func Handlers(router *gin.Engine) {
 	router.GET("/requests", controllers.GetRequests) // get requests
 
 	router.POST("/upload", controllers.UploadFile)
+	router.GET("/fetch_file/:file_type/:request_id", controllers.FetchFile)
 
 	router.GET("/approvals/:type", controllers.GetAllApprovals)          // get all approvals
 	router.POST("/internal_approval/action", controllers.ApproverAction) // approve or reject requests

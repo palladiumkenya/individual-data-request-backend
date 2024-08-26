@@ -17,3 +17,9 @@ func UploadFiles(DB *gorm.DB, files *RequestFiles) error {
 	DB.Create(&files)
 	return nil
 }
+
+func FetchFiles(DB *gorm.DB, FileType string, RequestId uuid.UUID) (*RequestFiles, error) {
+	var requestFile *RequestFiles
+	result := DB.First(&requestFile, "request = ? and file_name = ?", RequestId, FileType)
+	return requestFile, result.Error
+}
