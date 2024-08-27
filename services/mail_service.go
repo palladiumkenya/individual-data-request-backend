@@ -1,10 +1,10 @@
 package services
 
 import (
-	"os"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/mailgun/mailgun-go/v4"
-	"fmt"
+	"os"
 )
 
 func SendSimpleMessage(sender, subject, body, recipient string, c *gin.Context) (string, error) {
@@ -19,4 +19,3 @@ func SendSimpleMessage(sender, subject, body, recipient string, c *gin.Context) 
 	_, id, err := mg.Send(c, m)
 	return id, err
 }
-
