@@ -2,6 +2,10 @@ package server
 
 import (
 	"log"
+	"time"
+
+	"github.com/gin-contrib/cors"
+	"github.com/palladiumkenya/individual-data-request-backend/internal/db"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -12,6 +16,19 @@ import (
 var router = gin.Default()
 
 func Run() {
+	// CORS configuration
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	// migrate models
+	db.MigrateDB()
+
 	routes.Handlers(router)
 
 	// Load .env file
@@ -22,5 +39,5 @@ func Run() {
 	}
 
 	// Start server on port 8080
-	router.Run(":8080")
+	router.Run(`:8080`)
 }

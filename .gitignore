@@ -23,3 +23,8 @@ go.work.sum
 
 # env file
 .env
+individual-data-request-backend
+/supporting-documents
+/uploads
+
+.idea
