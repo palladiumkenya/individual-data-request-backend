@@ -35,7 +35,7 @@ func MigrateDB() (*gorm.DB, error) {
 	}
 
 	// Migrate the schema
-	err = DB.AutoMigrate(&models.Requesters{}, &models.Requests{}, &models.Assignees{}, &models.Approvals{}, &models.Approvers{}, &models.RequestFiles{})
+	err = DB.AutoMigrate(&models.Requesters{}, &models.Requests{}, &models.Assignees{}, &models.Approvals{}, &models.Approvers{}, &models.Files{})
 	if err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
