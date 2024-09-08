@@ -50,3 +50,9 @@ func CreateRequest(ctx context.Context, pool *pgxpool.Pool, request *Requests) e
 	}
 	return nil
 }
+
+func GetAssigneeTasks(DB *gorm.DB, assignee uuid.UUID) ([]Requests, error) {
+	var requests []Requests
+	result := DB.Preload("Requester").Preload("Assignee").Where("assignee_id =?", assignee).Find(&requests)
+	return requests, result.Error
+}

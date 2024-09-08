@@ -12,8 +12,10 @@ func Handlers(router *gin.Engine) {
 
 	router.GET("/requests", controllers.GetRequests) // get requests
 
-	router.POST("/upload", controllers.UploadFile)
-	router.GET("/fetch_request_files/:request_id", controllers.FetchFiles)
+	router.GET("/analysts/jobs", controllers.GetApprovedTasks)
+
+	router.POST("/upload", controllers.UploadFile) // upload to nextcloud
+	router.GET("/fetch_file/:file_type/:request_id", controllers.FetchFile)
 
 	router.GET("/approvals/:type", controllers.GetAllApprovals)         // get all approvals
 	router.POST("/approval/action", controllers.ApproverAction)         // approve or reject requests
