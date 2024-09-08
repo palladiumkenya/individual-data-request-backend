@@ -13,12 +13,13 @@ func Handlers(router *gin.Engine) {
 	router.GET("/requests", controllers.GetRequests) // get requests
 
 	router.POST("/upload", controllers.UploadFile)
-	router.GET("/fetch_file/:file_type/:request_id", controllers.FetchFile)
+	router.GET("/fetch_request_files/:request_id", controllers.FetchFiles)
 
-	router.GET("/approvals/:type", controllers.GetAllApprovals)          // get all approvals
-	router.POST("/internal_approval/action", controllers.ApproverAction) // approve or reject requests
-	router.GET("/approval/:type/:id", controllers.GetApproval)           // get approval page data
-	router.GET("/approvals/count/:type", controllers.GetApprovalsCount)  // get all approvals
+	router.GET("/approvals/:type", controllers.GetAllApprovals)         // get all approvals
+	router.POST("/approval/action", controllers.ApproverAction)         // approve or reject requests
+	router.GET("/approval/:type/:id", controllers.GetApproval)          // get approval page data
+	router.GET("/approvals/count/:type", controllers.GetApprovalsCount) // get all approvals
+	router.GET("/request/:id", controllers.GetRequestForApproval)       // get requests
 
 	router.POST("/new_review_thread", controllers.CreateReviewThread)      // create review thread
 	router.POST("/add_review", controllers.AddReview)                      // add review

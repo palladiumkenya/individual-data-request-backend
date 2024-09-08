@@ -41,25 +41,31 @@ func UploadFile(c *gin.Context) {
 	})
 }
 
-func FetchFile(c *gin.Context) {
+func FetchFiles(c *gin.Context) {
 	RequestId := c.Param("request_id")
-	FileType := c.Param("file_type")
 
 	DB, err := db.Connect()
-
-	pdfFile, err := models.FetchFiles(DB, FileType, uuid2.UUID(uuid.MustParse(RequestId)))
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Request File record not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "DB connection issue. Record not found"})
 			return
 		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 		return
 	}
 
+	pdfFile, err := models.FetchFiles(DB, uuid2.UUID(uuid.MustParse(RequestId)))
+	//fileFound := func() string {
+	//	if pdfFile != nil {
+	//		return pdfFile.FileURL
+	//	}
+	//	return ""
+	//}()
+
 	log.Printf("Return file url results")
+
 	c.JSON(http.StatusOK, gin.H{
 		"status": "success",
-		"data":   pdfFile.FileURL,
+		"data":   pdfFile,
 	})
 }

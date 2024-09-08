@@ -26,6 +26,22 @@ func GetRequests(c *gin.Context) {
 	})
 }
 
+func GetRequestForApproval(c *gin.Context) {
+	DB, err := db.Connect()
+	ID := c.Param("id")
+
+	approvals, err := models.GetRequestByID(DB, uuid.MustParse(ID))
+	if err != nil {
+		log.Fatalf("Error retrieving requests for approval page: %v\n", err)
+	}
+
+	log.Printf("Return approval results")
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   approvals,
+	})
+}
+
 func GetAllApprovals(c *gin.Context) {
 	approvalType := c.Param("type")
 
