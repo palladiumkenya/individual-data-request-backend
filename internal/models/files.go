@@ -22,9 +22,14 @@ func UploadFiles(DB *gorm.DB, files *Files) error {
 	return nil
 }
 
-
-func FetchFiles(DB *gorm.DB, FileType string, RequestId uuid.UUID) (*Files, error) {
+func FetchFile(DB *gorm.DB, FileType string, RequestId uuid.UUID) (*Files, error) {
 	var requestFile *Files
 	result := DB.First(&requestFile, "request = ? and file_name = ?", RequestId, FileType)
+	return requestFile, result.Error
+}
+
+func FetchFiles(DB *gorm.DB, RequestId uuid.UUID) ([]Files, error) {
+	var requestFile []Files
+	result := DB.Find(&requestFile, "request_id = ? ", RequestId)
 	return requestFile, result.Error
 }

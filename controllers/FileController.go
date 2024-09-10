@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	uuid2 "github.com/gofrs/uuid"
 	"github.com/google/uuid"
 	"github.com/palladiumkenya/individual-data-request-backend/internal/db"
 	"github.com/palladiumkenya/individual-data-request-backend/internal/models"
@@ -70,6 +69,36 @@ func UploadFile(c *gin.Context) {
 	})
 }
 
+func FetchFile(c *gin.Context) {
+	RequestId := c.Param("request_id")
+	FileType := c.Param("file_type")
+
+	DB, err := db.Connect()
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "DB connection issue. Record not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	pdfFile, err := models.FetchFile(DB, FileType, uuid.MustParse(RequestId))
+	//fileFound := func() string {
+	//	if pdfFile != nil {
+	//		return pdfFile.FileURL
+	//	}
+	//	return ""
+	//}()
+
+	log.Printf("Return file url results")
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   pdfFile,
+	})
+}
+
 func FetchFiles(c *gin.Context) {
 	RequestId := c.Param("request_id")
 
@@ -83,13 +112,7 @@ func FetchFiles(c *gin.Context) {
 		return
 	}
 
-	pdfFile, err := models.FetchFiles(DB, uuid2.UUID(uuid.MustParse(RequestId)))
-	//fileFound := func() string {
-	//	if pdfFile != nil {
-	//		return pdfFile.FileURL
-	//	}
-	//	return ""
-	//}()
+	pdfFile, err := models.FetchFiles(DB, uuid.MustParse(RequestId))
 
 	log.Printf("Return file url results")
 

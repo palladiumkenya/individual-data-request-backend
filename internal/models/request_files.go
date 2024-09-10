@@ -13,13 +13,7 @@ type RequestFiles struct {
 	FileURL  string    `gorm:"size:500;not null"`
 }
 
-func UploadFiles(DB *gorm.DB, files *RequestFiles) error {
+func UploadFile(DB *gorm.DB, files *RequestFiles) error {
 	DB.Create(&files)
 	return nil
-}
-
-func FetchFiles(DB *gorm.DB, RequestId uuid.UUID) ([]RequestFiles, error) {
-	var requestFile []RequestFiles
-	result := DB.Find(&requestFile, "request = ? ", RequestId)
-	return requestFile, result.Error
 }
