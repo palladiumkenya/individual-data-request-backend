@@ -16,7 +16,7 @@ type Requests struct {
 	Summery        string     `gorm:"size:500;not null"`
 	Status         string     `gorm:"size:100;not null"`
 	Date_Due       time.Time  `gorm:"type:date"`
-	Priority_level string     `gorm:"size:100;unique;not null"`
+	Priority_level string     `gorm:"size:100;not null"`
 	Requestor_id   uuid.UUID  `gorm:"type:uuid"`
 	Requester      Requesters `gorm:"foreignKey:Requestor_id"`
 	Assignee_id    uuid.UUID  `gorm:"type:uuid;null"`
