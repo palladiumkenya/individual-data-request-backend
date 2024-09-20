@@ -13,7 +13,7 @@ type RequestFiles struct {
 	FileURL  string    `gorm:"size:500;not null"`
 }
 
-func UploadFiles(DB *gorm.DB, files *RequestFiles) error {
+func UploadFile(DB *gorm.DB, files *RequestFiles) error {
 	DB.Create(&files)
 	return nil
 }

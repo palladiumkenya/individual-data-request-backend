@@ -1,8 +1,14 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/palladiumkenya/individual-data-request-backend/internal/db"
+	"github.com/palladiumkenya/individual-data-request-backend/internal/models"
 	"github.com/palladiumkenya/individual-data-request-backend/services"
+	"gorm.io/gorm"
+	"log"
 	"net/http"
 	"path/filepath"
 )
@@ -28,14 +34,14 @@ func UploadFile(c *gin.Context) {
 	}
 
 	// Save the file locally
-	localFilePath := filepath.Join("uploads", file.Filename)
+	localFilePath := filepath.Join("uploads", folderId, file.Filename)
 	if err := c.SaveUploadedFile(file, localFilePath); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
 		return
 	}
 
 	// Upload to Nextcloud and get the file URL
-	remoteFilePath := "/idr/files/" + file.Filename
+	remoteFilePath := fmt.Sprintf("idr/%s/%s/%s", destinationFolder, folderId, file.Filename)
 	fileURL, err := services.UploadFileToNextcloud(localFilePath, remoteFilePath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload file to Nextcloud"})
@@ -63,3 +69,55 @@ func UploadFile(c *gin.Context) {
 	})
 }
 
+func FetchFile(c *gin.Context) {
+	RequestId := c.Param("request_id")
+	FileType := c.Param("file_type")
+
+	DB, err := db.Connect()
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "DB connection issue. Record not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	pdfFile, err := models.FetchFile(DB, FileType, uuid.MustParse(RequestId))
+	//fileFound := func() string {
+	//	if pdfFile != nil {
+	//		return pdfFile.FileURL
+	//	}
+	//	return ""
+	//}()
+
+	log.Printf("Return file url results")
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   pdfFile,
+	})
+}
+
+func FetchFiles(c *gin.Context) {
+	RequestId := c.Param("request_id")
+
+	DB, err := db.Connect()
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "DB connection issue. Record not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	pdfFile, err := models.FetchFiles(DB, uuid.MustParse(RequestId))
+
+	log.Printf("Return file url results")
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   pdfFile,
+	})
+}
