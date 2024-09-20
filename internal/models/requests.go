@@ -56,3 +56,25 @@ func GetAssigneeTasks(DB *gorm.DB, assignee uuid.UUID) ([]Requests, error) {
 	result := DB.Preload("Requester").Preload("Assignee").Where("assignee_id =?", assignee).Find(&requests)
 	return requests, result.Error
 }
+
+func GetAssigneeTask(DB *gorm.DB, id uuid.UUID) ([]Requests, error) {
+	var requests []Requests
+	result := DB.Preload("Requester").Preload("Assignee").First(&requests, "ID = ?", id)
+	return requests, result.Error
+}
+
+func UpdateRequestStatus(DB *gorm.DB, requestID int, newStatus string) error {
+	// Find the request by ID
+	var request Requests
+	if err := DB.First(&request, "req_id = ?", requestID).Error; err != nil {
+		return err // Return the error if the request is not found or if there is another issue
+	}
+
+	// Update the status
+	request.Status = newStatus
+	if err := DB.Save(&request).Error; err != nil {
+		return err // Return the error if the update fails
+	}
+
+	return nil // Return nil if the update is successful
+}
