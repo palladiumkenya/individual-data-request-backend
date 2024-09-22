@@ -11,8 +11,10 @@ import (
 	"net/http"
 )
 
+var DB, err = db.Connect()
+
 func GetRequests(c *gin.Context) {
-	DB, err := db.Connect()
+	//DB, err := db.Connect()
 
 	approvals, err := models.GetRequests(DB)
 	if err != nil {
@@ -27,7 +29,7 @@ func GetRequests(c *gin.Context) {
 }
 
 func GetRequestForApproval(c *gin.Context) {
-	DB, err := db.Connect()
+	//DB, err := db.Connect()
 	ID := c.Param("id")
 
 	approvals, err := models.GetRequestByID(DB, uuid.MustParse(ID))
@@ -45,7 +47,7 @@ func GetRequestForApproval(c *gin.Context) {
 func GetAllApprovals(c *gin.Context) {
 	approvalType := c.Param("type")
 
-	DB, err := db.Connect()
+	//DB, err := db.Connect()
 
 	approvals, err := models.GetApprovalsByType(DB, approvalType)
 	if err != nil {
@@ -68,7 +70,7 @@ func GetAllApprovals(c *gin.Context) {
 func GetApprovalsCount(c *gin.Context) {
 	approvalType := c.Param("type")
 
-	DB, err := db.Connect()
+	//DB, err := db.Connect()
 
 	approvals, err := models.GetApprovalsCounts(DB, approvalType)
 	if err != nil {
@@ -92,7 +94,7 @@ func GetApproval(c *gin.Context) {
 	ID := c.Param("id")
 	approvalType := c.Param("type")
 
-	DB, err := db.Connect()
+	//DB, err := db.Connect()
 
 	approvals, err := models.GetApprovalByIDAndType(DB, uuid.MustParse(ID), approvalType)
 	if err != nil {
@@ -113,7 +115,7 @@ func GetApproval(c *gin.Context) {
 }
 
 func ApproverAction(c *gin.Context) {
-	DB, err := db.Connect()
+	//DB, err := db.Connect()
 
 	var newApproval *models.Approvals
 
