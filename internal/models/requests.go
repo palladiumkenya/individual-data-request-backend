@@ -19,6 +19,10 @@ type Requests struct {
 	Assignee_id    *uuid.UUID `gorm:"type:uuid;null"`
 	Assignee       Assignees  `gorm:"foreignKey:Assignee_id"`
 	Created_Date   time.Time  `gorm:"type:date"`
+
+	//Assignee_id    uuid.UUID  `gorm:"type:uuid;null"`
+	//Assignee       Assignees  `gorm:"foreignKey:Assignee_id"`
+	
 }
 
 type NewRequest struct {
@@ -42,7 +46,7 @@ func GetRequestByID(DB *gorm.DB, Id uuid.UUID) (*Requests, error) {
 
 func GetRequests(DB *gorm.DB) ([]Requests, error) {
 	var requests []Requests
-	result := DB.Find(&requests)
+	result := DB.Preload("Requester").Find(&requests)
 	return requests, result.Error
 }
 

@@ -62,21 +62,28 @@ func GetApprovals(DB *gorm.DB) ([]Approvals, error) {
 }
 
 func CreateApproval(DB *gorm.DB, approvalData *Approvals) (*Approvals, error) {
+	var approver *Approvers
+	DB.First(&approver, "approver_type = ?", approvalData.Approver_type)
+
 	var approval *Approvals
 
 	result := DB.Create(&Approvals{Comments: approvalData.Comments, Approver_type: approvalData.Approver_type,
 		Approved: approvalData.Approved, Requestor_id: approvalData.Requestor_id,
-		Request_id: approvalData.Request_id, Approval_Date: time.Now()})
+		Request_id: approvalData.Request_id, Approval_Date: time.Now(), Approver_id: approver.ID})
 
 	var request *Requests
 	DB.First(&request, "id = ?", approvalData.Request_id)
 
 	if isApproved(approvalData.Approved) {
-		request.Status = "approved"
+		//request.Status = "approved"
+		if err := DB.Model(&request).Update("status", "in progress").Error; err != nil {
+		}
 	} else {
-		request.Status = "rejected"
+		//request.Status = "rejected"
+		if err := DB.Model(&request).Update("status", "rejected").Error; err != nil {
+		}
 	}
-	DB.Save(&request)
+	//DB.Save(&request)
 	return approval, result.Error
 }
 
