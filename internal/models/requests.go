@@ -19,10 +19,6 @@ type Requests struct {
 	Assignee_id    *uuid.UUID `gorm:"type:uuid;null"`
 	Assignee       Assignees  `gorm:"foreignKey:Assignee_id"`
 	Created_Date   time.Time  `gorm:"type:date"`
-
-	//Assignee_id    uuid.UUID  `gorm:"type:uuid;null"`
-	//Assignee       Assignees  `gorm:"foreignKey:Assignee_id"`
-	
 }
 
 type NewRequest struct {
@@ -89,6 +85,8 @@ func UpdateRequestStatus(DB *gorm.DB, requestID int, newStatus string) error {
 
 	// Update the status
 	request.Status = newStatus
+	request.Assignee_id = nil
+
 	if err := DB.Save(&request).Error; err != nil {
 		return err // Return the error if the update fails
 	}
