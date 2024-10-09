@@ -22,11 +22,12 @@ func Handlers(router *gin.Engine) {
 
 	router.POST("/request/create", controllers.NewRequest) // New request
 
-	router.GET("/approvals/:type", controllers.GetAllApprovals)         // get all approvals
-	router.POST("/approval/action", controllers.ApproverAction)         // approve or reject requests
-	router.GET("/approval/:type/:id", controllers.GetApproval)          // get approval page data
-	router.GET("/approvals/count/:type", controllers.GetApprovalsCount) // get all approvals
-	router.GET("/request/:id", controllers.GetRequestForApproval)       // get requests
+	router.GET("/approvals/:type", controllers.GetAllApprovals)                             // get all approvals
+	router.POST("/approval/action", controllers.ApproverAction)                             // approve or reject requests
+	router.GET("/approval/:type/:id", controllers.GetApproval)                              // get approval page data
+	router.GET("/approvals/count/:type", controllers.GetApprovalsCount)                     // get all approvals
+	router.GET("/request/:id", controllers.GetRequestForApproval)                           // get requests
+	router.POST("/assign/action/:requestid/:assigneeId", controllers.AssignToAnalystAction) //  assing analyst
 
 	router.POST("/new_review_thread", controllers.CreateReviewThread)      // create review thread
 	router.POST("/add_review", controllers.AddReview)                      // add review
