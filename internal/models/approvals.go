@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"log"
 	"time"
 )
 
@@ -71,15 +72,24 @@ func CreateApproval(DB *gorm.DB, approvalData *Approvals) (*Approvals, error) {
 		Approved: approvalData.Approved, Requestor_id: approvalData.Requestor_id,
 		Request_id: approvalData.Request_id, Approval_Date: time.Now(), Approver_id: approver.ID})
 
-	var request *Requests
+	var request Requests
 	DB.First(&request, "id = ?", approvalData.Request_id)
 
-	if isApproved(approvalData.Approved) {
-		//request.Status = "approved"
-		if err := DB.Model(&request).Update("status", "in progress").Error; err != nil {
+	if isApproved(approvalData.Approved) && approvalData.Approver_type == "internal" {
+		// Update the status
+		request.Status = "review stage"
+		if err := DB.Save(&request).Error; err != nil {
+			log.Fatalf("Error updating request status: %v\n", err)
+		}
+
+	} else if isApproved(approvalData.Approved) && approvalData.Approver_type == "external" {
+		// Update the status
+		request.Status = "approved"
+		if err := DB.Save(&request).Error; err != nil {
+			log.Fatalf("Error updating request status: %v\n", err)
 		}
 	} else {
-		//request.Status = "rejected"
+		//"rejected
 		if err := DB.Model(&request).Update("status", "rejected").Error; err != nil {
 		}
 	}
