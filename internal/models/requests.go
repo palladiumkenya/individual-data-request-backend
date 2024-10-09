@@ -19,10 +19,6 @@ type Requests struct {
 	Assignee_id    *uuid.UUID `gorm:"type:uuid;null"`
 	Assignee       Assignees  `gorm:"foreignKey:Assignee_id"`
 	Created_Date   time.Time  `gorm:"type:date"`
-
-	//Assignee_id    uuid.UUID  `gorm:"type:uuid;null"`
-	//Assignee       Assignees  `gorm:"foreignKey:Assignee_id"`
-	
 }
 
 type NewRequest struct {
@@ -94,4 +90,21 @@ func UpdateRequestStatus(DB *gorm.DB, requestID int, newStatus string) error {
 	}
 
 	return nil // Return nil if the update is successful
+}
+
+func AssignRequestToAnalyst(DB *gorm.DB, Id uuid.UUID, analystID uuid.UUID) (error, error) {
+	// Find the request by ID
+	var request Requests
+	if err := DB.First(&request, "id = ?", Id).Error; err != nil {
+		return err, nil // Return the error if the request is not found or if there is another issue
+	}
+
+	//Update the status
+	request.Assignee_id = &analystID
+	request.Status = "assigned"
+	if err := DB.Save(&request).Error; err != nil {
+		return err, nil // Return the error if the update fails
+	}
+
+	return nil, nil // Return nil if the update is successful
 }
