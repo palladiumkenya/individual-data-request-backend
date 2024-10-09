@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/palladiumkenya/individual-data-request-backend/internal/db"
@@ -12,59 +11,114 @@ import (
 	"net/http"
 )
 
-func GetRequests(c *gin.Context) {
-	//cfg := config.LoadConfig()
-	DB, err := db.Connect()
+var DB, err = db.Connect()
 
-	// Retrieve a requests
-	requests, err := models.GetRequests(DB)
+func GetRequests(c *gin.Context) {
+	//DB, err := db.Connect()
+
+	approvals, err := models.GetRequests(DB)
 	if err != nil {
-		log.Fatalf("Error retrieving requests: %v\n", err)
+		log.Fatalf("Error retrieving approvals: %v\n", err)
 	}
 
-	fmt.Printf("Retrieved requests: %+v\n", requests)
-
-	// Set the Content-Type header and write the JSON response
+	log.Printf("Return approval results")
 	c.JSON(http.StatusOK, gin.H{
 		"status": "success",
-		"data":   requests,
+		"data":   approvals,
 	})
 }
 
-func GetInternalApproval(c *gin.Context) {
+func GetRequestForApproval(c *gin.Context) {
+	//DB, err := db.Connect()
 	ID := c.Param("id")
-	DB, err := db.Connect()
 
-	// Retrieve a request
-	requests, err := models.GetApprovalByID(DB, uuid.MustParse(ID))
+	approvals, err := models.GetRequestByID(DB, uuid.MustParse(ID))
+	if err != nil {
+		log.Fatalf("Error retrieving requests for approval page: %v\n", err)
+	}
+
+	log.Printf("Return approval results")
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   approvals,
+	})
+}
+
+func GetAllApprovals(c *gin.Context) {
+	approvalType := c.Param("type")
+
+	//DB, err := db.Connect()
+
+	approvals, err := models.GetApprovalsByType(DB, approvalType)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			// Return 404 if not found
-			c.JSON(http.StatusNotFound, gin.H{"error": "Request not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "Approvals not found"})
 			return
 		}
-		// Handle other potential errors
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 		return
 	}
 
-	fmt.Printf("Retrieved requests: %+v\n", requests)
-
-	// Set the Content-Type header and write the JSON response
+	log.Printf("Return approval results")
 	c.JSON(http.StatusOK, gin.H{
 		"status": "success",
-		"data":   requests,
+		"data":   approvals,
+	})
+
+}
+
+func GetApprovalsCount(c *gin.Context) {
+	approvalType := c.Param("type")
+
+	//DB, err := db.Connect()
+
+	approvals, err := models.GetApprovalsCounts(DB, approvalType)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Approvals not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	log.Printf("Return approval results")
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   approvals,
+	})
+
+}
+
+func GetApproval(c *gin.Context) {
+	ID := c.Param("id")
+	approvalType := c.Param("type")
+
+	//DB, err := db.Connect()
+
+	approvals, err := models.GetApprovalByIDAndType(DB, uuid.MustParse(ID), approvalType)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Approval not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	log.Printf("Return approval results")
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   approvals,
 	})
 
 }
 
 func ApproverAction(c *gin.Context) {
-	DB, err := db.Connect()
+	//DB, err := db.Connect()
 
-	// create approval
 	var newApproval *models.Approvals
 
-	// Call BindJSON to bind the received JSON to approval
 	if err := c.BindJSON(&newApproval); err != nil {
 		return
 	}
@@ -74,16 +128,14 @@ func ApproverAction(c *gin.Context) {
 	approval, err := models.CreateApproval(DB, newApproval)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			// Return 404 if not found
 			c.JSON(http.StatusNotFound, gin.H{"error": "Approval failed to be created"})
 			return
 		}
-		// Handle other potential errors
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 		return
 	}
 
-	// Set the Content-Type header and write the JSON response
+	log.Printf("Return approval results")
 	c.JSON(http.StatusOK, gin.H{
 		"status": "success",
 		"data":   approval,
