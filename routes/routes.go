@@ -21,6 +21,7 @@ func Handlers(router *gin.Engine) {
 	router.GET("/fetch_request_files/:request_id", controllers.FetchFiles)
 
 	router.POST("/request/create", controllers.NewRequest) // New request
+	router.GET("/user/role", controllers.GetUserRole)                  // get user role
 
 	router.GET("/approvals/:type", controllers.GetAllApprovals)                             // get all approvals
 	router.POST("/approval/action", controllers.ApproverAction)                             // approve or reject requests
