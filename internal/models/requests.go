@@ -70,6 +70,12 @@ func GetAssigneeTasks(DB *gorm.DB, assignee uuid.UUID) ([]Requests, error) {
 	return requests, result.Error
 }
 
+func GetRequesterRequests(DB *gorm.DB, requester_id uuid.UUID) ([]Requests, error) {
+	var requests []Requests
+	result := DB.Preload("Requester").Preload("Assignee").Where("requestor_id =?", requester_id).Find(&requests)
+	return requests, result.Error
+}
+
 func GetAssigneeTask(DB *gorm.DB, id uuid.UUID) ([]Requests, error) {
 	var requests []Requests
 	result := DB.Preload("Requester").Preload("Assignee").First(&requests, "ID = ?", id)
