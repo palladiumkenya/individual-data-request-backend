@@ -32,3 +32,9 @@ func GetRequesters(DB *gorm.DB) ([]Requesters, error) {
 //	}
 //	return nil
 //}
+
+func CheckUserRequester(DB *gorm.DB, emailStr string) (Requesters, error) {
+	var requester Requesters
+	result := DB.Find(&requester, "email = ?", emailStr)
+	return requester, result.Error
+}

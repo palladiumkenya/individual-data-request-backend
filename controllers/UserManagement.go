@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/palladiumkenya/individual-data-request-backend/internal/db"
+	"github.com/palladiumkenya/individual-data-request-backend/internal/models"
 	"log"
 	"net/http"
 )
@@ -21,48 +22,51 @@ func GetUserRole(c *gin.Context) {
 		return
 	}
 
-	var count int64
-
 	// Check if the user is a requester
-	result := DB.Table("requesters").Where("email =?", emailStr).Count(&count)
-	if result.Error != nil {
-		log.Printf("Error checking if the user is a requester: %v\n", result.Error)
+	requester, err := models.CheckUserRequester(DB, emailStr)
+	if err != nil {
+		log.Printf("Error checking if the user is a requester: %v\n", err)
+		return
 	}
-	if count > 0 {
+	if requester.Email == emailStr {
 		c.JSON(http.StatusOK, gin.H{
 			"status": "success",
 			"data": gin.H{
 				"role": "requester",
+				"id":   requester.ID,
 			},
 		})
 		return
 	}
 
 	// Check if the user is an approver
-	result = DB.Table("approvers").Where("email =?", emailStr).Count(&count)
-	if result.Error != nil {
-		log.Printf("Error checking if the user is an approver: %v\n", result.Error)
+	approver, err := models.CheckUserApprover(DB, emailStr)
+	if err != nil {
+		log.Printf("Error checking if the user is an approver: %v\n", err)
 	}
-	if count > 0 {
+	if approver.Email == emailStr {
 		c.JSON(http.StatusOK, gin.H{
 			"status": "success",
 			"data": gin.H{
 				"role": "approver",
+				"id":   approver.ID,
+				"type": approver.Approver_Type,
 			},
 		})
 		return
 	}
 
 	// Check if the user is an analyst
-	result = DB.Table("assignees").Where("email =?", emailStr).Count(&count)
-	if result.Error != nil {
-		log.Printf("Error checking if the user is an analyst: %v\n", result.Error)
+	analyst, err := models.CheckUserAnalyst(DB, emailStr)
+	if err != nil {
+		log.Printf("Error checking if the user is an analyst: %v\n", err)
 	}
-	if count > 0 {
+	if analyst.Email == emailStr {
 		c.JSON(http.StatusOK, gin.H{
 			"status": "success",
 			"data": gin.H{
 				"role": "analyst",
+				"id":   analyst.ID,
 			},
 		})
 		return
@@ -72,7 +76,16 @@ func GetUserRole(c *gin.Context) {
 		"status": "success",
 		"data": gin.H{
 			"role": nil,
+			"id":   nil,
 		},
 	})
 }
 
+func CreateNewRequester(c *gin.Context) {
+	_, err := db.Connect()
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, gin.H{"message": err.Error()})
+		return
+	}
+
+}

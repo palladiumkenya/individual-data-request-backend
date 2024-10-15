@@ -20,7 +20,6 @@ func Handlers(router *gin.Engine) {
 	router.GET("/fetch_file/:file_type/:request_id", controllers.FetchFile)
 	router.GET("/fetch_request_files/:request_id", controllers.FetchFiles)
 
-	router.POST("/request/create", controllers.NewRequest) // New request
 	router.POST("/request/create", controllers.NewRequest)                 // New request
 	router.GET("/request/requester/get", controllers.GetRequesterRequests) // get requests
 
