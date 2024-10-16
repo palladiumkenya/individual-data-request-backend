@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/palladiumkenya/individual-data-request-backend/internal/db"
 	"github.com/palladiumkenya/individual-data-request-backend/internal/models"
@@ -82,10 +83,34 @@ func GetUserRole(c *gin.Context) {
 }
 
 func CreateNewRequester(c *gin.Context) {
-	_, err := db.Connect()
+	DB, err := db.Connect()
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, gin.H{"message": err.Error()})
 		return
 	}
+
+	var requester models.Requesters
+	if err := c.BindJSON(&requester); err != nil {
+		c.IndentedJSON(http.StatusNotAcceptable, gin.H{"message": err.Error()})
+		return
+	}
+	fmt.Printf("requestStatus: %+v\n", requester)
+
+	id, err := models.CreateRequester(DB, requester)
+	if err != nil {
+		log.Printf("Error checking if the user is a requester: %v\n", err)
+		c.JSON(http.StatusNotAcceptable, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "Requester created successfully",
+		"data": gin.H{
+			"role": "requester",
+			"id":   id,
+		},
+	})
+	return
 
 }

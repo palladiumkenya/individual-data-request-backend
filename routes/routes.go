@@ -24,6 +24,7 @@ func Handlers(router *gin.Engine) {
 	router.GET("/request/requester/get", controllers.GetRequesterRequests) // get requests
 
 	router.GET("/user/role", controllers.GetUserRole)                  // get user role
+	router.POST("/user/new_requester", controllers.CreateNewRequester) // create new requester
 
 	router.GET("/approvals/:type", controllers.GetAllApprovals)                             // get all approvals
 	router.POST("/approval/action", controllers.ApproverAction)                             // approve or reject requests
