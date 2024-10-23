@@ -22,6 +22,7 @@ func Handlers(router *gin.Engine) {
 
 	router.POST("/request/create", controllers.NewRequest)                 // New request
 	router.GET("/request/requester/get", controllers.GetRequesterRequests) // get requests
+	router.GET("/request/get", controllers.GetRequestDetails)              // get request details
 
 	router.GET("/user/role", controllers.GetUserRole)                  // get user role
 	router.POST("/user/new_requester", controllers.CreateNewRequester) // create new requester

@@ -50,7 +50,7 @@ func CreateRequest(DB *gorm.DB, newRequest NewRequest) (uuid.UUID, error) {
 	request := Requests{
 		ID:             uuid.New(), // Generate a new UUID for the request
 		Summery:        newRequest.Summery,
-		Status:         "Pending", // Default status
+		Status:         "pending", // Default status
 		Date_Due:       newRequest.DateDue,
 		Priority_level: newRequest.Priority,
 		Created_Date:   time.Now(), // Set to current time
@@ -113,4 +113,10 @@ func AssignRequestToAnalyst(DB *gorm.DB, Id uuid.UUID, analystID uuid.UUID) (err
 	}
 
 	return nil, nil // Return nil if the update is successful
+}
+
+func GetRequesterRequestDetails(DB *gorm.DB, id uuid.UUID) (Requests, error) {
+	var request Requests
+	result := DB.Preload("Requester").Preload("Assignee").First(&request, "id = ?", id)
+	return request, result.Error
 }
