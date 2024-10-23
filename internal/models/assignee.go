@@ -32,3 +32,9 @@ func CreateAssignee(ctx context.Context, pool *pgxpool.Pool, assignee *Assignees
 	}
 	return nil
 }
+
+func GetAnalysts(DB *gorm.DB) ([]Assignees, error) {
+	var assigneesAvailable []Assignees
+	result := DB.Find(&assigneesAvailable)
+	return assigneesAvailable, result.Error
+}
