@@ -32,6 +32,7 @@ func Handlers(router *gin.Engine) {
 	router.GET("/approvals/count/:type", controllers.GetApprovalsCount)                     // get all approvals
 	router.GET("/request/:id", controllers.GetRequestForApproval)                           // get requests
 	router.POST("/assign/action/:requestid/:assigneeId", controllers.AssignToAnalystAction) //  assing analyst
+	router.GET("/analysts", controllers.GetAnalysts)                                        // analysts get all requests
 
 	router.POST("/new_review_thread", controllers.CreateReviewThread)      // create review thread
 	router.POST("/add_review", controllers.AddReview)                      // add review

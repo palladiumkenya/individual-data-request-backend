@@ -41,3 +41,9 @@ func CheckUserAnalyst(DB *gorm.DB, email string) (Assignees, error) {
 	}
 	return analyst, result.Error
 }
+
+func GetAnalysts(DB *gorm.DB) ([]Assignees, error) {
+	var assigneesAvailable []Assignees
+	result := DB.Find(&assigneesAvailable)
+	return assigneesAvailable, result.Error
+}
