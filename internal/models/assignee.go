@@ -33,6 +33,15 @@ func CreateAssignee(ctx context.Context, pool *pgxpool.Pool, assignee *Assignees
 	return nil
 }
 
+func CheckUserAnalyst(DB *gorm.DB, email string) (Assignees, error) {
+	var analyst Assignees
+	result := DB.Find(&analyst, "email = ?", email)
+	if result.RowsAffected == 0 {
+		return analyst, nil
+	}
+	return analyst, result.Error
+}
+
 func GetAnalysts(DB *gorm.DB) ([]Assignees, error) {
 	var assigneesAvailable []Assignees
 	result := DB.Find(&assigneesAvailable)
