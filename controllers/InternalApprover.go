@@ -142,3 +142,18 @@ func ApproverAction(c *gin.Context) {
 	})
 
 }
+
+func GetAnalysts(c *gin.Context) {
+	//DB, err := db.Connect()
+
+	approvals, err := models.GetAnalysts(DB)
+	if err != nil {
+		log.Fatalf("Error retrieving approvals: %v\n", err)
+	}
+
+	log.Printf("Return approval results")
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   approvals,
+	})
+}
