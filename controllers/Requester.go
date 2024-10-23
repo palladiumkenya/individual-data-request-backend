@@ -64,3 +64,33 @@ func GetRequesterRequests(c *gin.Context) {
 	})
 
 }
+
+func GetRequestDetails(c *gin.Context) {
+	DB, err := db.Connect()
+	requestUuidStr := c.Query("request_id")
+	requestUuid, err := uuid.Parse(requestUuidStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Request UUID"})
+		log.Fatalf("Error invalid UUID: %v\n", err)
+		return
+	}
+	// Retrieve a requests
+	request, err := models.GetRequesterRequestDetails(DB, requestUuid)
+	if err != nil {
+		log.Fatalf("Error retrieving requests: %v\n", err)
+	}
+	// Get files attached to the request
+	files, err := models.FetchFiles(DB, requestUuid)
+	if err != nil {
+		log.Printf("Error retrieving files: %v\n", err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data": gin.H{
+			"request": request,
+			"files":   files,
+		},
+	})
+
+}
