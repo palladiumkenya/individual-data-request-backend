@@ -32,3 +32,17 @@ func GetRequesters(DB *gorm.DB) ([]Requesters, error) {
 //	}
 //	return nil
 //}
+
+func CreateRequester(DB *gorm.DB, requester Requesters) (uuid.UUID, error) {
+	if err := DB.Create(&requester).Error; err != nil {
+		return uuid.UUID{}, err // Return the error and a zero UUID
+	}
+	return requester.ID, nil
+
+}
+
+func CheckUserRequester(DB *gorm.DB, emailStr string) (Requesters, error) {
+	var requester Requesters
+	result := DB.Find(&requester, "email = ?", emailStr)
+	return requester, result.Error
+}
