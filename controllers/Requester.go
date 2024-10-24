@@ -6,8 +6,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/palladiumkenya/individual-data-request-backend/internal/db"
 	"github.com/palladiumkenya/individual-data-request-backend/internal/models"
+	"github.com/palladiumkenya/individual-data-request-backend/services"
 	"log"
 	"net/http"
+	"os"
 )
 
 func NewRequest(c *gin.Context) {
@@ -36,6 +38,28 @@ func NewRequest(c *gin.Context) {
 			"message": "Request created successfully",
 		},
 	})
+
+	// Launch background job to send email alert
+	go func() {
+		template := "email_templates/requester_new_request_alert.html"
+		frontendUrl := os.Getenv("FRONTEND_URL")
+		body := map[string]interface{}{
+			"request_id":   id,
+			"request_url":  frontendUrl + "/requester/request-details?id=" + id.String(),
+			"frontend_url": frontendUrl,
+		}
+
+		requester, _ := models.GetRequesterByID(DB, request.Requestor_id)
+		email := requester.Email
+		subject := "Request Created Successfully"
+
+		emailId, err := services.SendRequesterEmail(subject, body, email, template, c)
+		if err != nil {
+			log.Fatalf("Error sending email: %v\n", err)
+		} else {
+			fmt.Printf("Email sent successfully. Email ID: %s\n", emailId)
+		}
+	}()
 
 }
 
