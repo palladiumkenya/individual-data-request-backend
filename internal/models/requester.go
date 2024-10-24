@@ -24,11 +24,16 @@ func GetRequesters(DB *gorm.DB) ([]Requesters, error) {
 	return requesters, result.Error
 }
 
-//func CreateRequester(ctx context.Context, pool *pgxpool.Pool, requester *Requesters) error {
-//	_, err := pool.Exec(ctx, "INSERT INTO Requesters (email) VALUES ($1)",
-//		requester.Email)
-//	if err != nil {
-//		return err
-//	}
-//	return nil
-//}
+func CreateRequester(DB *gorm.DB, requester Requesters) (uuid.UUID, error) {
+	if err := DB.Create(&requester).Error; err != nil {
+		return uuid.UUID{}, err // Return the error and a zero UUID
+	}
+	return requester.ID, nil
+
+}
+
+func CheckUserRequester(DB *gorm.DB, emailStr string) (Requesters, error) {
+	var requester Requesters
+	result := DB.Find(&requester, "email = ?", emailStr)
+	return requester, result.Error
+}

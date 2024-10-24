@@ -28,3 +28,15 @@ func CreateApprover(DB *gorm.DB, approver *Approvers) error {
 		Email: "aden.mi15@gmail.com"})
 	return nil
 }
+
+func CheckUserApprover(DB *gorm.DB, email string) (Approvers, error) {
+	var approver Approvers
+	result := DB.Find(&approver, "email = ?", email)
+	return approver, result.Error
+}
+
+func GetRandomApprover(DB *gorm.DB, ApproverType string) (*Approvers, error) {
+	var approver *Approvers
+	result := DB.First(&approver, "approver_type = ?", ApproverType)
+	return approver, result.Error
+}
