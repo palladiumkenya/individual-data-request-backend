@@ -13,6 +13,8 @@ type Files struct {
 	Request   *Requests  `gorm:"foreignKey:RequestId"`
 	FileName  string     `gorm:"size:100;not null"`
 	FileURL   string     `gorm:"size:500;not null"`
+	Comment   string     `gorm:"size:1000"`
+	Folder    string     `gorm:"size:100;default:supporting-documents;not null"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

@@ -55,6 +55,7 @@ func UploadFile(c *gin.Context) {
 		FileName:  file.Filename,
 		FileURL:   fileURL,
 		RequestId: requestUuid,
+		Folder:    destinationFolder,
 	}
 
 	// Save the file details to the database
