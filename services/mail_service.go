@@ -23,7 +23,7 @@ func SendSimpleMessage(sender, subject, body, recipient string, c *gin.Context) 
 	return id, err
 }
 
-func SendRequesterEmail(subject string, body map[string]interface{}, recipient string, email_template string, c *gin.Context) (string, error) {
+func SendEmailAlerts(subject string, body map[string]interface{}, recipient string, email_template string, c *gin.Context) (string, error) {
 	sender := "no-reply@kenyahmis.org"
 	// Load environment variables
 	mailgunKey := os.Getenv("MAILGUN_KEY")

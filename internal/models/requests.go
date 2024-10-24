@@ -10,7 +10,7 @@ import (
 type Requests struct {
 	ID             uuid.UUID  `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
 	ReqId          int        `gorm:"type:integer;autoIncrement;unique;not null"`
-	Summery        string     `gorm:"size:500;not null"`
+	Summery        string     `gorm:"size:1500;not null"`
 	Status         string     `gorm:"size:100;not null"`
 	Date_Due       time.Time  `gorm:"type:date"`
 	Priority_level string     `gorm:"size:100;not null"`
@@ -46,7 +46,7 @@ func GetRequests(DB *gorm.DB) ([]Requests, error) {
 	return requests, result.Error
 }
 
-func CreateRequest(DB *gorm.DB, newRequest NewRequest) (uuid.UUID, error) {
+func CreateRequest(DB *gorm.DB, newRequest NewRequest) (Requests, error) {
 	request := Requests{
 		ID:             uuid.New(), // Generate a new UUID for the request
 		Summery:        newRequest.Summery,
@@ -59,9 +59,9 @@ func CreateRequest(DB *gorm.DB, newRequest NewRequest) (uuid.UUID, error) {
 	}
 
 	if err := DB.Create(&request).Error; err != nil {
-		return uuid.UUID{}, err // Return the error and a zero UUID
+		return request, err // Return the error and a zero UUID
 	}
-	return request.ID, nil // Return the ID of the created request
+	return request, nil // Return the ID of the created request
 }
 
 func GetAssigneeTasks(DB *gorm.DB, assignee uuid.UUID) ([]Requests, error) {
