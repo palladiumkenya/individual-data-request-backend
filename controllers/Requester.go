@@ -6,8 +6,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/palladiumkenya/individual-data-request-backend/internal/db"
 	"github.com/palladiumkenya/individual-data-request-backend/internal/models"
+	"github.com/palladiumkenya/individual-data-request-backend/services"
 	"log"
 	"net/http"
+	"os"
+	"time"
 )
 
 func NewRequest(c *gin.Context) {
@@ -21,7 +24,7 @@ func NewRequest(c *gin.Context) {
 	fmt.Printf("requestStatus: %+v\n", request)
 
 	// Updated Status a requests
-	id, err := models.CreateRequest(DB, request)
+	savedRequest, err := models.CreateRequest(DB, request)
 	if err != nil {
 		log.Fatalf("Error retrieving requests: %v\n", err)
 	}
@@ -32,10 +35,51 @@ func NewRequest(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status": "success",
 		"data": gin.H{
-			"id":      id,
+			"id":      savedRequest.ID,
 			"message": "Request created successfully",
 		},
 	})
+
+	// Launch background job to send email alert
+	go func() {
+		// send acknowledgement email to requester
+		template := "email_templates/requester_new_request_alert.html"
+		frontendUrl := os.Getenv("FRONTEND_URL")
+		body := map[string]interface{}{
+			"request_id":   savedRequest.ID,
+			"request_url":  frontendUrl + "/requester/request-details?id=" + savedRequest.ID.String(),
+			"frontend_url": frontendUrl,
+		}
+
+		requester, _ := models.GetRequesterByID(DB, request.Requestor_id)
+		email := requester.Email
+		subject := "Request Created Successfully"
+
+		emailId, err := services.SendEmailAlerts(subject, body, email, template, c)
+		if err != nil {
+			log.Fatalf("Error sending email: %v\n", err)
+		} else {
+			fmt.Printf("Email sent successfully. Email ID: %s\n", emailId)
+		}
+
+		// send review email to reviewer
+		reviewer, _ := models.GetRandomApprover(DB, "InternalApprover")
+		email = reviewer.Email
+		subject = "New Request Needs Review"
+		template = "email_templates/reviewer_new_request_alert.html"
+		body = map[string]interface{}{
+			"request_id":   savedRequest.ID,
+			"request_url":  frontendUrl + "/internal/action/" + string(rune(savedRequest.ReqId)) + "?type=internal&id=" + savedRequest.ID.String(),
+			"due_date":     savedRequest.Date_Due.Format(time.ANSIC),
+			"date_created": savedRequest.Created_Date.Format(time.ANSIC),
+		}
+		emailId, err = services.SendEmailAlerts(subject, body, email, template, c)
+		if err != nil {
+			log.Fatalf("Error sending email: %v\n", err)
+		} else {
+			fmt.Printf("Email sent successfully. Email ID: %s\n", emailId)
+		}
+	}()
 
 }
 
