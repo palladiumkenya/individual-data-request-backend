@@ -17,6 +17,12 @@ func GetApproversByID(DB *gorm.DB, Id uuid.UUID) (*Approvers, error) {
 	return approvers, result.Error
 }
 
+func GetApproversByType(DB *gorm.DB, approver_type string) (*Approvers, error) {
+	var approvers *Approvers
+	result := DB.First(&approvers, "approver_type = ?", approver_type)
+	return approvers, result.Error
+}
+
 func GetApproverss(DB *gorm.DB) ([]Approvers, error) {
 	var approverss []Approvers
 	result := DB.Find(&approverss)
