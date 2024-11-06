@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: idr-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ENV_FILE=.env
+    volumes:
+      - ./.env:/root/.env
+    networks:
+      - idr-network
+    extra_hosts:
+      - "cloud.kenyahmis.org:192.168.1.45"
+
+networks:
+  idr-network:
+    driver: bridge
