@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: idr-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ENV_FILE=.env
+    volumes:
+      - ./.env:/root/.env
+    networks:
+      - idr-network
+    depends_on:
+      - postgres
+    extra_hosts:
+      - "cloud.kenyahmis.org:192.168.1.45"
+  postgres:
+    container_name: idr-postgres
+    image: postgres:latest
+    env_file:
+      - .env-postgres
+    environment:
+      POSTGRES_USER: idr
+      POSTGRES_DB: idr
+    ports:
+      - "5555:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    networks:
+      - idr-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U idr"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  idr-network:
+    name: idr-network
+    driver: bridge
+
+volumes:
+  postgres-data:

@@ -23,6 +23,8 @@ go.work.sum
 
 # env file
 .env
+.env-postgres
+
 individual-data-request-backend
 /supporting-documents
 /uploads
