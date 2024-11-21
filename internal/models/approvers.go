@@ -23,16 +23,22 @@ func GetApproversByType(DB *gorm.DB, approver_type string) (*Approvers, error) {
 	return approvers, result.Error
 }
 
-func GetApproverss(DB *gorm.DB) ([]Approvers, error) {
+func GetApprovers(DB *gorm.DB) ([]Approvers, error) {
 	var approverss []Approvers
 	result := DB.Find(&approverss)
 	return approverss, result.Error
 }
 
-func CreateApprover(DB *gorm.DB, approver *Approvers) error {
-	DB.Create(&Approvers{ID: uuid.MustParse("44f75fd1-67b7-411c-8c9e-311afd5cf1eb"),
-		Email: "aden.mi15@gmail.com"})
-	return nil
+func CreateApprover(DB *gorm.DB, approver Approvers) (uuid.UUID, error) {
+	if err := DB.Create(&approver).Error; err != nil {
+		return uuid.UUID{}, err // Return the error and a zero UUID
+	}
+	return approver.ID, nil
+}
+
+func DeleteApprover(DB *gorm.DB, id uuid.UUID) error {
+	result := DB.Delete(&Approvers{}, "id = ?", id)
+	return result.Error
 }
 
 func CheckUserApprover(DB *gorm.DB, email string) (Approvers, error) {

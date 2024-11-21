@@ -63,7 +63,11 @@ func NewRequest(c *gin.Context) {
 		}
 
 		// send review email to reviewer
-		reviewer, _ := models.GetRandomApprover(DB, "InternalApprover")
+		reviewer, err := models.GetRandomApprover(DB, "InternalApprover")
+		if err != nil {
+			log.Fatalf("Error getting approver: %v\n", err)
+			return
+		}
 		email = reviewer.Email
 		subject = "New Request Needs Review"
 		template = "email_templates/reviewer_new_request_alert.html"
@@ -85,7 +89,18 @@ func NewRequest(c *gin.Context) {
 
 func GetRequesterRequests(c *gin.Context) {
 	DB, err := db.Connect()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database connection failed"})
+		log.Fatalf("Database connection failed: %v\n", err)
+		return
+	}
+
 	requesterUuidStr := c.Query("requester")
+	if requesterUuidStr == "" || requesterUuidStr == "null" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Requester UUID is required"})
+		return
+	}
+
 	requesterUuid, err := uuid.Parse(requesterUuidStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Requester UUID"})
@@ -112,6 +127,10 @@ func GetRequesterRequests(c *gin.Context) {
 func GetRequestDetails(c *gin.Context) {
 	DB, err := db.Connect()
 	requestUuidStr := c.Query("request_id")
+	if requestUuidStr == "" || requestUuidStr == "null" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Request UUID is required"})
+		return
+	}
 	requestUuid, err := uuid.Parse(requestUuidStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Request UUID"})

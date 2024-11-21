@@ -6,21 +6,30 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
+	"time"
 )
 
 var DB *gorm.DB
 
 func Connect() (*gorm.DB, error) {
 	cfg := config.LoadConfig()
+	var DB *gorm.DB
+	var err error
 
-	log.Printf("Connecting to database with URL: %s", cfg.DatabaseURL)
+	for i := 0; i < 5; i++ { // Retry up to 5 times
+		log.Printf("Connecting to database with URL: %s", cfg.DatabaseURL)
+		DB, err = gorm.Open(postgres.Open(cfg.DatabaseURL), &gorm.Config{})
+		if err == nil {
+			log.Println("Successfully connected to the database")
+			return DB, nil
+		}
 
-	DB, err := gorm.Open(postgres.Open(cfg.DatabaseURL), &gorm.Config{})
-	if err != nil {
-		log.Fatalf("failed to connect database: %v", err)
+		log.Printf("Failed to connect to database: %v. Retrying in 5 seconds...", err)
+		time.Sleep(5 * time.Second)
 	}
 
-	return DB, nil
+	log.Fatalf("Failed to connect to database after multiple attempts: %v", err)
+	return nil, err
 }
 
 func MigrateDB() (*gorm.DB, error) {
