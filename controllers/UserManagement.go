@@ -18,7 +18,7 @@ func GetUserRole(c *gin.Context) {
 	}
 
 	emailStr := c.Query("email")
-	if emailStr == "" {
+	if emailStr == "" || emailStr == "null" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Email Provided"})
 		log.Fatalf("Invalid Email Provided")
 		return
@@ -151,7 +151,7 @@ func DeleteApprover(c *gin.Context) {
 		return
 	}
 	idStr := c.Query("id")
-	if idStr == "" {
+	if idStr == "" || idStr == "null" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Approver UUID"})
 		log.Fatalf("Error invalid UUID: %v\n", err)
 		return

@@ -96,7 +96,7 @@ func GetRequesterRequests(c *gin.Context) {
 	}
 
 	requesterUuidStr := c.Query("requester")
-	if requesterUuidStr == "" {
+	if requesterUuidStr == "" || requesterUuidStr == "null" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Requester UUID is required"})
 		return
 	}
@@ -127,6 +127,10 @@ func GetRequesterRequests(c *gin.Context) {
 func GetRequestDetails(c *gin.Context) {
 	DB, err := db.Connect()
 	requestUuidStr := c.Query("request_id")
+	if requestUuidStr == "" || requestUuidStr == "null" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Request UUID is required"})
+		return
+	}
 	requestUuid, err := uuid.Parse(requestUuidStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Request UUID"})
