@@ -25,6 +25,7 @@ COPY --from=builder /app/idr_sop_app .
 
 # Copy the .env file (useful if you have it in the container)
 COPY .env .env
+COPY email_templates email_templates/
 
 # Expose the port (match the one specified in the .env file)
 EXPOSE 8080
