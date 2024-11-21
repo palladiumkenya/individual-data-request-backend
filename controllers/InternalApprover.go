@@ -236,3 +236,19 @@ func SendEmailNotifications(request_id string, approver_type string, approved *b
 	return emailId, err
 
 }
+
+func GetApprovers(c *gin.Context) {
+	DB, err := db.Connect()
+	if err != nil {
+		log.Fatalf("Error connecting to database: %v\n", err)
+	}
+	approvers, err := models.GetApprovers(DB)
+	if err != nil {
+		log.Fatalf("Error retrieving approvers: %v\n", err)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   approvers,
+	})
+	return
+}

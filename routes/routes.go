@@ -24,9 +24,12 @@ func Handlers(router *gin.Engine) {
 	router.GET("/request/requester/get", controllers.GetRequesterRequests) // get requests
 	router.GET("/request/get", controllers.GetRequestDetails)              // get request details
 
-	router.GET("/user/role", controllers.GetUserRole)                  // get user role
-	router.POST("/user/new_requester", controllers.CreateNewRequester) // create new requester
+	router.GET("/user/role", controllers.GetUserRole)                   // get user role
+	router.POST("/user/new_requester", controllers.CreateNewRequester)  // create new requester
+	router.POST("/user/create_approver", controllers.CreateNewApprover) // create new approver
+	router.DELETE("/user/delete_approver", controllers.DeleteApprover)  // delete requester
 
+	router.GET("/approvers", controllers.GetApprovers)                                      // get approvers
 	router.GET("/approvals/:type", controllers.GetAllApprovals)                             // get all approvals
 	router.POST("/approval/action", controllers.ApproverAction)                             // approve or reject requests
 	router.GET("/approval/:type/:id", controllers.GetApproval)                              // get approval page data

@@ -89,7 +89,18 @@ func NewRequest(c *gin.Context) {
 
 func GetRequesterRequests(c *gin.Context) {
 	DB, err := db.Connect()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database connection failed"})
+		log.Fatalf("Database connection failed: %v\n", err)
+		return
+	}
+
 	requesterUuidStr := c.Query("requester")
+	if requesterUuidStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Requester UUID is required"})
+		return
+	}
+
 	requesterUuid, err := uuid.Parse(requesterUuidStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Requester UUID"})
