@@ -173,7 +173,7 @@ func GetAnalysts(c *gin.Context) {
 func SendEmailNotifications(request_id string, approver_type string, approved *bool, c *gin.Context) (string, error) {
 	// Launch background job to send email alert
 	// send acknowledgement email to requester
-	template := "email_templates/request_requester_rejected.html"
+	template := "email_templates/request_reviewer_notifications.html"
 	frontendUrl := os.Getenv("FRONTEND_URL")
 
 	reviewer, _ := models.GetApproversByType(DB, approver_type)
@@ -291,7 +291,7 @@ func GetRejectedApproval(c *gin.Context) {
 		return
 	}
 
-	log.Printf("Return approvers results")
+	log.Printf("Return rejected approval results")
 	c.JSON(http.StatusOK, gin.H{
 		"status": "success",
 		"data":   approvals,
