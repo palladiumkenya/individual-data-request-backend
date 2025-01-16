@@ -29,6 +29,13 @@ func GetApprovers(DB *gorm.DB) ([]Approvers, error) {
 	return approverss, result.Error
 }
 
+func GetApproversByEmail(DB *gorm.DB, email string) ([]Approvers, error) {
+	var approvers []Approvers
+	result := DB.Find(&approvers, "email = ?", email)
+	//result := DB.Model(&Approvers{}).Select("email").Scan(&approvers)
+	return approvers, result.Error
+}
+
 func CreateApprover(DB *gorm.DB, approver Approvers) (uuid.UUID, error) {
 	if err := DB.Create(&approver).Error; err != nil {
 		return uuid.UUID{}, err // Return the error and a zero UUID

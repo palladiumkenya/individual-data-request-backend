@@ -119,7 +119,7 @@ func GetApproval(c *gin.Context) {
 func ApproverAction(c *gin.Context) {
 	//DB, err := db.Connect()
 
-	var newApproval *models.Approvals
+	var newApproval *models.CreateApprovalsStruct
 
 	if err := c.BindJSON(&newApproval); err != nil {
 		return
@@ -251,4 +251,27 @@ func GetApprovers(c *gin.Context) {
 		"data":   approvers,
 	})
 	return
+}
+
+func GetApproversByEmails(c *gin.Context) {
+	email := c.Param("email")
+
+	//DB, err := db.Connect()
+
+	approvals, err := models.GetApproversByEmail(DB, email)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Approvers not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	log.Printf("Return approvers results")
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   approvals,
+	})
+
 }
