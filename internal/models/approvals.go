@@ -27,9 +27,10 @@ func GetApprovalsByType(DB *gorm.DB, ApproveType string) ([]Approvals, error) {
 	return approvals, result.Error
 }
 
-func GetApprovalByID(DB *gorm.DB, Id uuid.UUID) (*Approvals, error) {
-	var approval *Approvals
-	result := DB.Preload("Requester").Preload("Request").Preload("Approver").First(&approval, "request_id = ?", Id)
+func GetRejectedApproval(DB *gorm.DB, request_id uuid.UUID) ([]Approvals, error) {
+	var approval []Approvals
+	result := DB.Find(&approval, "request_id = ? and approved = false", request_id)
+
 	return approval, result.Error
 }
 

@@ -173,7 +173,7 @@ func GetAnalysts(c *gin.Context) {
 func SendEmailNotifications(request_id string, approver_type string, approved *bool, c *gin.Context) (string, error) {
 	// Launch background job to send email alert
 	// send acknowledgement email to requester
-	template := "email_templates/request_reviewer_notifications.html"
+	template := "email_templates/request_requester_rejected.html"
 	frontendUrl := os.Getenv("FRONTEND_URL")
 
 	reviewer, _ := models.GetApproversByType(DB, approver_type)
@@ -262,6 +262,29 @@ func GetApproversByEmails(c *gin.Context) {
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Approvers not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	log.Printf("Return approvers results")
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   approvals,
+	})
+
+}
+
+func GetRejectedApproval(c *gin.Context) {
+	request_id := c.Param("request_id")
+
+	//DB, err := db.Connect()
+
+	approvals, err := models.GetRejectedApproval(DB, uuid.MustParse(request_id))
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "No reject request reviews not found"})
 			return
 		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
