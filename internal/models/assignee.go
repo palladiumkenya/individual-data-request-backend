@@ -47,3 +47,13 @@ func GetAnalysts(DB *gorm.DB) ([]Assignees, error) {
 	result := DB.Find(&assigneesAvailable)
 	return assigneesAvailable, result.Error
 }
+
+func GetAssignedAnalyst(DB *gorm.DB, request_id uuid.UUID) ([]Assignees, error) {
+	var request *Requests
+	DB.First(&request, "id = ?", request_id)
+
+	var assignedAnalyst []Assignees
+	result := DB.First(&assignedAnalyst, "id = ?", request.Assignee_id)
+
+	return assignedAnalyst, result.Error
+}

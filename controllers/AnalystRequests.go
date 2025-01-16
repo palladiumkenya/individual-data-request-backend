@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/palladiumkenya/individual-data-request-backend/internal/db"
 	"github.com/palladiumkenya/individual-data-request-backend/internal/models"
+	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"strconv"
@@ -94,6 +95,29 @@ func UpdateAnalystRequest(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status": "success",
 		"data":   "Updated request",
+	})
+
+}
+
+func GetAssignedAnalyst(c *gin.Context) {
+	request_id := c.Param("request_id")
+
+	//DB, err := db.Connect()
+
+	approvals, err := models.GetAssignedAnalyst(DB, uuid.MustParse(request_id))
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Assignee not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	log.Printf("Return assignee results")
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   approvals,
 	})
 
 }

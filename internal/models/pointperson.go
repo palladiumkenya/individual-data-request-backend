@@ -1,0 +1,48 @@
+package models
+
+import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
+type PointPersons struct {
+	ID    uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
+	Email string    `gorm:"size:100;not null"`
+}
+
+func GetPointPersonByID(DB *gorm.DB, Id uuid.UUID) (*PointPersons, error) {
+	var PointPersons *PointPersons
+	result := DB.First(&PointPersons, "id = ?", Id)
+	return PointPersons, result.Error
+}
+
+func GetPointPersonByType(DB *gorm.DB, pointperson_type string) (*PointPersons, error) {
+	var PointPersons *PointPersons
+	result := DB.First(&PointPersons, "pointperson_type = ?", pointperson_type)
+	return PointPersons, result.Error
+}
+
+func GetPointPerson(DB *gorm.DB) ([]PointPersons, error) {
+	var PointPersons []PointPersons
+	result := DB.Find(&PointPersons)
+	return PointPersons, result.Error
+}
+
+func GetPointPersonByEmail(DB *gorm.DB, email string) ([]PointPersons, error) {
+	var PointPersons []PointPersons
+	result := DB.First(&PointPersons, "email = ?", email)
+	//result := DB.Model(&PointPersons{}).Select("email").Scan(&PointPersons)
+	return PointPersons, result.Error
+}
+
+func CreatePointPerson(DB *gorm.DB, PointPersons PointPersons) (uuid.UUID, error) {
+	if err := DB.Create(&PointPersons).Error; err != nil {
+		return uuid.UUID{}, err // Return the error and a zero UUID
+	}
+	return PointPersons.ID, nil
+}
+
+func DeletePointPerson(DB *gorm.DB, id uuid.UUID) error {
+	result := DB.Delete(&PointPersons{}, "id = ?", id)
+	return result.Error
+}
