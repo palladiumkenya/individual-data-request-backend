@@ -63,7 +63,7 @@ func NewRequest(c *gin.Context) {
 		}
 
 		// send review email to reviewer
-		reviewer, err := models.GetRandomApprover(DB, "InternalApprover")
+		reviewer, err := models.GetRandomApprover(DB, "internal")
 		if err != nil {
 			log.Fatalf("Error getting approver: %v\n", err)
 			return

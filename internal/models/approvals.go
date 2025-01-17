@@ -27,9 +27,10 @@ func GetApprovalsByType(DB *gorm.DB, ApproveType string) ([]Approvals, error) {
 	return approvals, result.Error
 }
 
-func GetApprovalByID(DB *gorm.DB, Id uuid.UUID) (*Approvals, error) {
-	var approval *Approvals
-	result := DB.Preload("Requester").Preload("Request").Preload("Approver").First(&approval, "request_id = ?", Id)
+func GetRejectedApproval(DB *gorm.DB, request_id uuid.UUID) ([]Approvals, error) {
+	var approval []Approvals
+	result := DB.Find(&approval, "request_id = ? and approved = false", request_id)
+
 	return approval, result.Error
 }
 
@@ -62,9 +63,21 @@ func GetApprovals(DB *gorm.DB) ([]Approvals, error) {
 	return approvals, result.Error
 }
 
-func CreateApproval(DB *gorm.DB, approvalData *Approvals) (*Approvals, error) {
+type CreateApprovalsStruct struct {
+	ID             uuid.UUID  `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
+	Comments       string     `gorm:"size:500;null"`
+	Approver_type  string     `gorm:"size:100;not null"`
+	Approver_email string     `gorm:"size:100;not null"`
+	Approved       *bool      `gorm:"bool;default:null"`
+	Requestor_id   uuid.UUID  `gorm:"type:uuid"`
+	Requester      Requesters `gorm:"foreignKey:Requestor_id"`
+	Request_id     uuid.UUID  `gorm:"type:uuid"`
+	Request        Requests   `gorm:"foreignKey:Request_id"`
+}
+
+func CreateApproval(DB *gorm.DB, approvalData *CreateApprovalsStruct) (*Approvals, error) {
 	var approver *Approvers
-	DB.First(&approver, "approver_type = ?", approvalData.Approver_type)
+	DB.First(&approver, "approver_type = ? and email = ?", approvalData.Approver_type, approvalData.Approver_email)
 
 	var approval *Approvals
 

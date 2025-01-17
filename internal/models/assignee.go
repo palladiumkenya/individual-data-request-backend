@@ -59,3 +59,13 @@ func DeleteAnalyst(DB *gorm.DB, id uuid.UUID) error {
 	result := DB.Delete(&Assignees{}, "id = ?", id)
 	return result.Error
 }
+
+func GetAssignedAnalyst(DB *gorm.DB, request_id uuid.UUID) ([]Assignees, error) {
+	var request *Requests
+	DB.First(&request, "id = ?", request_id)
+
+	var assignedAnalyst []Assignees
+	result := DB.First(&assignedAnalyst, "id = ?", request.Assignee_id)
+
+	return assignedAnalyst, result.Error
+}

@@ -31,7 +31,10 @@ func Handlers(router *gin.Engine) {
 	router.POST("/user/create_analyst", controllers.CreateNewAnalyst)   // create new analyst
 	router.DELETE("/user/delete_analyst", controllers.DeleteAnalyst)    // delete new analyst
 
-	router.GET("/approvers", controllers.GetApprovers)                                      // get approvers
+	router.GET("/approvers", controllers.GetApprovers)                // get approvers
+	router.GET("/approvers/:email", controllers.GetApproversByEmails) // get approvers
+
+	router.GET("/rejected/approval/:request_id", controllers.GetRejectedApproval)           // get rejected approvals
 	router.GET("/approvals/:type", controllers.GetAllApprovals)                             // get all approvals
 	router.POST("/approval/action", controllers.ApproverAction)                             // approve or reject requests
 	router.GET("/approval/:type/:id", controllers.GetApproval)                              // get approval page data
@@ -39,6 +42,7 @@ func Handlers(router *gin.Engine) {
 	router.GET("/request/:id", controllers.GetRequestForApproval)                           // get requests
 	router.POST("/assign/action/:requestid/:assigneeId", controllers.AssignToAnalystAction) //  assing analyst
 	router.GET("/analysts", controllers.GetAnalysts)                                        // analysts get all requests
+	router.GET("/analyst/:request_id", controllers.GetAssignedAnalyst)                      // get assigned analyst for a request
 
 	router.POST("/new_review_thread", controllers.CreateReviewThread)      // create review thread
 	router.POST("/add_review", controllers.AddReview)                      // add review
