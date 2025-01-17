@@ -23,10 +23,10 @@ func GetPointPersonByEmail(DB *gorm.DB, email string) ([]PointPersons, error) {
 	return pointpersons, result.Error
 }
 
-func GetPointPersonByType(DB *gorm.DB, pointperson_type string) (*PointPersons, error) {
-	var PointPersons *PointPersons
-	result := DB.First(&PointPersons, "pointperson_type = ?", pointperson_type)
-	return PointPersons, result.Error
+func GetPointPersonsEmails(DB *gorm.DB) ([]string, error) {
+	var pointpersons []string
+	result := DB.Model(&PointPersons{}).Select("email").Scan(&pointpersons)
+	return pointpersons, result.Error
 }
 
 func GetPointPerson(DB *gorm.DB) ([]PointPersons, error) {

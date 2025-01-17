@@ -29,6 +29,13 @@ func GetApprovers(DB *gorm.DB) ([]Approvers, error) {
 	return approverss, result.Error
 }
 
+func GetAllExternalApprovers(DB *gorm.DB) ([]string, error) {
+	var approvers []string
+	//result := DB.Find(&approverss, "approver_type = ?", "external")
+	result := DB.Model(&Approvers{}).Select("email").Where("approver_type = ?", "external").Scan(&approvers)
+	return approvers, result.Error
+}
+
 func GetApproversByEmail(DB *gorm.DB, email string) ([]Approvers, error) {
 	var approvers []Approvers
 	result := DB.Find(&approvers, "email = ?", email)

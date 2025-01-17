@@ -29,8 +29,9 @@ func Handlers(router *gin.Engine) {
 	router.POST("/user/create_approver", controllers.CreateNewApprover) // create new approver
 	router.DELETE("/user/delete_approver", controllers.DeleteApprover)  // delete requester
 
-	router.GET("/approvers", controllers.GetApprovers)                // get approvers
-	router.GET("/approvers/:email", controllers.GetApproversByEmails) // get approvers
+	router.GET("/approvers", controllers.GetApprovers)                    // get approvers
+	router.GET("/approvers/:email", controllers.GetApproversByEmails)     // get approvers
+	router.GET("/externalapprovers", controllers.GetAllExternalApprovers) // get approvers
 
 	router.GET("/pointpersons/:email", controllers.GetPointPersonByEmail) // get approvers
 
