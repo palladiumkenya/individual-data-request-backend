@@ -137,11 +137,6 @@ func ApproverAction(c *gin.Context) {
 		return
 	}
 
-	//send email
-	//sendEmailAlert, err := SendEmailNotifications(newApproval.Request_id, newApproval.Approver_type, newApproval.Approved)
-	//if err != nil {
-	//	log.Fatalf("Error sending emails: %v\n", err)
-	//}
 	sendAlert, err := SendEmailNotifications(newApproval.Request_id.String(), newApproval.Approver_type, newApproval.Approved, c)
 	if err != nil {
 		log.Fatalf(sendAlert, " : Error sending emails: %v\n", err)
@@ -257,7 +252,6 @@ func SendEmailNotifications(request_id string, approver_type string, approved *b
 	}
 
 	return emailId, err
-
 }
 
 func GetApprovers(c *gin.Context) {
