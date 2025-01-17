@@ -40,3 +40,26 @@ func AssignToAnalystAction(c *gin.Context) {
 		"data":   assign,
 	})
 }
+
+func GetPointPersonByEmail(c *gin.Context) {
+	email := c.Param("email")
+
+	//DB, err := db.Connect()
+
+	approvals, err := models.GetPointPersonByEmail(DB, email)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Pointperson not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	log.Printf("Return pointperson results")
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   approvals,
+	})
+
+}

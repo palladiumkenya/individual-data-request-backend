@@ -32,6 +32,8 @@ func Handlers(router *gin.Engine) {
 	router.GET("/approvers", controllers.GetApprovers)                // get approvers
 	router.GET("/approvers/:email", controllers.GetApproversByEmails) // get approvers
 
+	router.GET("/pointpersons/:email", controllers.GetPointPersonByEmail) // get approvers
+
 	router.GET("/rejected/approval/:request_id", controllers.GetRejectedApproval)           // get rejected approvals
 	router.GET("/approvals/:type", controllers.GetAllApprovals)                             // get all approvals
 	router.POST("/approval/action", controllers.ApproverAction)                             // approve or reject requests
