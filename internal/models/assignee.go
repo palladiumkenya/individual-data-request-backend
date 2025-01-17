@@ -47,3 +47,15 @@ func GetAnalysts(DB *gorm.DB) ([]Assignees, error) {
 	result := DB.Find(&assigneesAvailable)
 	return assigneesAvailable, result.Error
 }
+
+func CreateAnalyst(DB *gorm.DB, analyst Assignees) (uuid.UUID, error) {
+	if err := DB.Create(&analyst).Error; err != nil {
+		return uuid.UUID{}, err // Return the error and a zero UUID
+	}
+	return analyst.ID, nil
+}
+
+func DeleteAnalyst(DB *gorm.DB, id uuid.UUID) error {
+	result := DB.Delete(&Assignees{}, "id = ?", id)
+	return result.Error
+}
