@@ -131,7 +131,7 @@ func CreateNewApprover(c *gin.Context) {
 
 	id, err := models.CreateApprover(DB, approver)
 	if err != nil {
-		log.Printf("Error checking if the user is a requester: %v\n", err)
+		log.Printf("Error creating approver: %v\n", err)
 		c.JSON(http.StatusNotAcceptable, gin.H{"message": err.Error()})
 		return
 	}
@@ -170,6 +170,64 @@ func DeleteApprover(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "success",
 		"message": "Approver deleted successfully",
+	})
+	return
+}
+
+func CreateNewAnalyst(c *gin.Context) {
+	DB, err := db.Connect()
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, gin.H{"message": err.Error()})
+		return
+	}
+
+	var analyst models.Assignees
+	if err := c.BindJSON(&analyst); err != nil {
+		c.IndentedJSON(http.StatusNotAcceptable, gin.H{"message": err.Error()})
+		return
+	}
+
+	id, err := models.CreateAnalyst(DB, analyst)
+	if err != nil {
+		log.Printf("Error creating the analyst: %v\n", err)
+		c.JSON(http.StatusNotAcceptable, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "Analyst created successfully",
+		"id":      id,
+	})
+	return
+}
+
+func DeleteAnalyst(c *gin.Context) {
+	DB, err := db.Connect()
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, gin.H{"message": err.Error()})
+		return
+	}
+	idStr := c.Query("id")
+	if idStr == "" || idStr == "null" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Analyst UUID"})
+		log.Fatalf("Error invalid UUID: %v\n", err)
+		return
+	}
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Analyst UUID"})
+		log.Fatalf("Error invalid UUID: %v\n", err)
+		return
+	}
+	err = models.DeleteAnalyst(DB, id)
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "Analyst deleted successfully",
 	})
 	return
 }

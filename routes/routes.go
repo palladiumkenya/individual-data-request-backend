@@ -28,6 +28,8 @@ func Handlers(router *gin.Engine) {
 	router.POST("/user/new_requester", controllers.CreateNewRequester)  // create new requester
 	router.POST("/user/create_approver", controllers.CreateNewApprover) // create new approver
 	router.DELETE("/user/delete_approver", controllers.DeleteApprover)  // delete requester
+	router.POST("/user/create_analyst", controllers.CreateNewAnalyst)   // create new analyst
+	router.DELETE("/user/delete_analyst", controllers.DeleteAnalyst)    // delete new analyst
 
 	router.GET("/approvers", controllers.GetApprovers)                    // get approvers
 	router.GET("/approvers/:email", controllers.GetApproversByEmails)     // get approvers
