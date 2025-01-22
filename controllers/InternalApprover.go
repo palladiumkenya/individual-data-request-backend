@@ -137,11 +137,6 @@ func ApproverAction(c *gin.Context) {
 		return
 	}
 
-	//send email
-	//sendEmailAlert, err := SendEmailNotifications(newApproval.Request_id, newApproval.Approver_type, newApproval.Approved)
-	//if err != nil {
-	//	log.Fatalf("Error sending emails: %v\n", err)
-	//}
 	sendAlert, err := SendEmailNotifications(newApproval.Request_id.String(), newApproval.Approver_type, newApproval.Approved, c)
 	if err != nil {
 		log.Fatalf(sendAlert, " : Error sending emails: %v\n", err)
@@ -176,8 +171,10 @@ func SendEmailNotifications(request_id string, approver_type string, approved *b
 	template := "email_templates/request_reviewer_notifications.html"
 	frontendUrl := os.Getenv("FRONTEND_URL")
 
-	reviewer, _ := models.GetApproversByType(DB, approver_type)
-	email := reviewer.Email
+	//reviewer, _ := models.GetApproversByType(DB, approver_type)
+	//externalReviewersEmails, _ := models.GetAllExternalApprovers(DB)
+	requester, _ := models.GetRequesterByRequestID(DB, uuid.MustParse(request_id))
+	email := requester.Email
 	//subject := approved ? "Request is Aprroved!" :"Request is Rejected!"
 	subject := "Request is Rejected!"
 	message := "After review we regret to inform you that your data request was declined. Please login to view comments of the review."
@@ -204,37 +201,57 @@ func SendEmailNotifications(request_id string, approver_type string, approved *b
 		getRequest, _ := models.GetRequestByID(DB, uuid.MustParse(request_id))
 		if approver_type == "internal" {
 			// send review email to reviewer
-			email = reviewer.Email
-			subject = "External Review stage"
-			template = "email_templates/request_reviewer_notifications.html"
-			body = map[string]interface{}{
-				"request_id":    request_id,
-				"request_url":   frontendUrl + "/external/action/" + string(rune(getRequest.ReqId)) + "?type=external&id=" + request_id,
-				"message_title": "Your Review is Needed",
-				"message":       "A request has been approved  and transitioned to the External Review stage. Please navigate to your dashboard to review",
+			externalReviewersEmails, _ := models.GetAllExternalApprovers(DB)
+
+			for _, recipient := range externalReviewersEmails {
+				email = recipient
+				subject = "External Review stage"
+				template = "email_templates/request_reviewer_notifications.html"
+				body = map[string]interface{}{
+					"request_id":    request_id,
+					"request_url":   frontendUrl + "/external/action/" + string(rune(getRequest.ReqId)) + "?type=external&id=" + request_id,
+					"message_title": "Your Review is Needed",
+					"message":       "A request has been approved  and transitioned to the External Review stage. Please navigate to your dashboard to review",
+				}
+
+				emailId, err = services.SendEmailAlerts(subject, body, email, template, c)
+				if err != nil {
+					log.Fatalf("Error sending email: %v\n", err)
+				} else {
+					fmt.Printf("Email sent successfully. Email ID: %s\n", emailId)
+				}
 			}
 		} else {
 			// send review email to point person
-			email = reviewer.Email
-			subject = "Request Assignment stage"
-			template = "email_templates/request_reviewer_notifications.html"
-			body = map[string]interface{}{
-				"request_id":    request_id,
-				"request_url":   frontendUrl + "/assign/action/" + string(rune(getRequest.ReqId)) + "?type=external&id=" + request_id,
-				"message_title": "Your Review is Needed",
-				"message":       "A request has been approved by both the Internal and External Reviewers. Please navigate to your dashboard to assign it to an analyst.",
+			pointpersonsEmails, _ := models.GetPointPersonsEmails(DB)
+			for _, recipient := range pointpersonsEmails {
+
+				email = recipient
+				subject = "Request Assignment stage"
+				template = "email_templates/request_reviewer_notifications.html"
+				body = map[string]interface{}{
+					"request_id":    request_id,
+					"request_url":   frontendUrl + "/assign/action/" + string(rune(getRequest.ReqId)) + "?type=external&id=" + request_id,
+					"message_title": "Assign to Analysts!",
+					"message":       "A request has been approved by both the Internal and External Reviewers. Please navigate to your dashboard to assign it to an analyst.",
+				}
+				emailId, err = services.SendEmailAlerts(subject, body, email, template, c)
+				if err != nil {
+					log.Fatalf("Error sending email: %v\n", err)
+				} else {
+					fmt.Printf("Email sent successfully. Email ID: %s\n", emailId)
+				}
 			}
 		}
-		emailId, err = services.SendEmailAlerts(subject, body, email, template, c)
-		if err != nil {
-			log.Fatalf("Error sending email: %v\n", err)
-		} else {
-			fmt.Printf("Email sent successfully. Email ID: %s\n", emailId)
-		}
+		//emailId, err = services.SendEmailAlerts(subject, body, email, template, c)
+		//if err != nil {
+		//	log.Fatalf("Error sending email: %v\n", err)
+		//} else {
+		//	fmt.Printf("Email sent successfully. Email ID: %s\n", emailId)
+		//}
 	}
 
 	return emailId, err
-
 }
 
 func GetApprovers(c *gin.Context) {
@@ -297,4 +314,20 @@ func GetRejectedApproval(c *gin.Context) {
 		"data":   approvals,
 	})
 
+}
+
+func GetAllExternalApprovers(c *gin.Context) {
+	DB, err := db.Connect()
+	if err != nil {
+		log.Fatalf("Error connecting to database: %v\n", err)
+	}
+	approvers, err := models.GetAllExternalApprovers(DB)
+	if err != nil {
+		log.Fatalf("Error retrieving external approvers: %v\n", err)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   approvers,
+	})
+	return
 }

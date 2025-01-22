@@ -31,8 +31,11 @@ func Handlers(router *gin.Engine) {
 	router.POST("/user/create_analyst", controllers.CreateNewAnalyst)   // create new analyst
 	router.DELETE("/user/delete_analyst", controllers.DeleteAnalyst)    // delete new analyst
 
-	router.GET("/approvers", controllers.GetApprovers)                // get approvers
-	router.GET("/approvers/:email", controllers.GetApproversByEmails) // get approvers
+	router.GET("/approvers", controllers.GetApprovers)                    // get approvers
+	router.GET("/approvers/:email", controllers.GetApproversByEmails)     // get approvers
+	router.GET("/externalapprovers", controllers.GetAllExternalApprovers) // get approvers
+
+	router.GET("/pointpersons/:email", controllers.GetPointPersonByEmail) // get approvers
 
 	router.GET("/rejected/approval/:request_id", controllers.GetRejectedApproval)           // get rejected approvals
 	router.GET("/approvals/:type", controllers.GetAllApprovals)                             // get all approvals

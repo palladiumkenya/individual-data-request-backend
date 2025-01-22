@@ -16,22 +16,22 @@ func GetPointPersonByID(DB *gorm.DB, Id uuid.UUID) (*PointPersons, error) {
 	return PointPersons, result.Error
 }
 
-func GetPointPersonByType(DB *gorm.DB, pointperson_type string) (*PointPersons, error) {
-	var PointPersons *PointPersons
-	result := DB.First(&PointPersons, "pointperson_type = ?", pointperson_type)
-	return PointPersons, result.Error
+func GetPointPersonByEmail(DB *gorm.DB, email string) ([]PointPersons, error) {
+	var pointpersons []PointPersons
+	result := DB.Find(&pointpersons, "email = ?", email)
+	//result := DB.Model(&Approvers{}).Select("email").Scan(&approvers)
+	return pointpersons, result.Error
+}
+
+func GetPointPersonsEmails(DB *gorm.DB) ([]string, error) {
+	var pointpersons []string
+	result := DB.Model(&PointPersons{}).Select("email").Scan(&pointpersons)
+	return pointpersons, result.Error
 }
 
 func GetPointPerson(DB *gorm.DB) ([]PointPersons, error) {
 	var PointPersons []PointPersons
 	result := DB.Find(&PointPersons)
-	return PointPersons, result.Error
-}
-
-func GetPointPersonByEmail(DB *gorm.DB, email string) ([]PointPersons, error) {
-	var PointPersons []PointPersons
-	result := DB.First(&PointPersons, "email = ?", email)
-	//result := DB.Model(&PointPersons{}).Select("email").Scan(&PointPersons)
 	return PointPersons, result.Error
 }
 

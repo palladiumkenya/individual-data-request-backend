@@ -18,6 +18,15 @@ func GetRequesterByID(DB *gorm.DB, Id uuid.UUID) (*Requesters, error) {
 	return requester, result.Error
 }
 
+func GetRequesterByRequestID(DB *gorm.DB, Request_Id uuid.UUID) (*Requesters, error) {
+	var request *Requests
+	DB.First(&request, "id = ? ", Request_Id)
+
+	var requester *Requesters
+	result := DB.First(&requester, "id = ?", request.Requestor_id)
+	return requester, result.Error
+}
+
 func GetRequesters(DB *gorm.DB) ([]Requesters, error) {
 	var requesters []Requesters
 	result := DB.Find(&requesters)
