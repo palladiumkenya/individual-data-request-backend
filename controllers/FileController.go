@@ -20,6 +20,7 @@ func UploadFile(c *gin.Context) {
 	// Get destination folder
 	destinationFolder := c.PostForm("destination") // either "files" or "supporting-documents"
 	request := c.PostForm("request")               // request that this file is associated with
+	filePurpose := c.PostForm("file_purpose")      // file purpose defined in the request
 	var requestUuid *uuid.UUID
 	if request != "" {
 		parsedUuid, _ := uuid.Parse(request)
@@ -52,10 +53,11 @@ func UploadFile(c *gin.Context) {
 	// TODO:: Save And User ID
 	DB, err := db.Connect()
 	requestFile := models.Files{
-		FileName:  file.Filename,
-		FileURL:   fileURL,
-		RequestId: requestUuid,
-		Folder:    destinationFolder,
+		FileName:    file.Filename,
+		FileURL:     fileURL,
+		RequestId:   requestUuid,
+		Folder:      destinationFolder,
+		FilePurpose: filePurpose,
 	}
 
 	// Save the file details to the database
