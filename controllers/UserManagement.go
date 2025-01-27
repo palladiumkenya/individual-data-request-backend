@@ -24,21 +24,15 @@ func GetUserRole(c *gin.Context) {
 		return
 	}
 
+	var roles []gin.H
+
 	// Check if the user is a requester
 	requester, err := models.CheckUserRequester(DB, emailStr)
 	if err != nil {
 		log.Printf("Error checking if the user is a requester: %v\n", err)
-		return
 	}
 	if requester.Email == emailStr {
-		c.JSON(http.StatusOK, gin.H{
-			"status": "success",
-			"data": gin.H{
-				"role": "requester",
-				"id":   requester.ID,
-			},
-		})
-		return
+		roles = append(roles, gin.H{"role": "requester", "id": requester.ID})
 	}
 
 	// Check if the user is an approver
@@ -47,15 +41,7 @@ func GetUserRole(c *gin.Context) {
 		log.Printf("Error checking if the user is an approver: %v\n", err)
 	}
 	if approver.Email == emailStr {
-		c.JSON(http.StatusOK, gin.H{
-			"status": "success",
-			"data": gin.H{
-				"role": "approver",
-				"id":   approver.ID,
-				"type": approver.Approver_Type,
-			},
-		})
-		return
+		roles = append(roles, gin.H{"role": "approver", "id": approver.ID, "type": approver.Approver_Type})
 	}
 
 	// Check if the user is an analyst
@@ -64,23 +50,25 @@ func GetUserRole(c *gin.Context) {
 		log.Printf("Error checking if the user is an analyst: %v\n", err)
 	}
 	if analyst.Email == emailStr {
+		roles = append(roles, gin.H{"role": "analyst", "id": analyst.ID})
+	}
+
+	if len(roles) > 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"status": "success",
 			"data": gin.H{
-				"role": "analyst",
-				"id":   analyst.ID,
+				"roles": roles,
 			},
 		})
-		return
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"status": "success",
+			"data": gin.H{
+				"roles": nil,
+			},
+		})
 	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"status": "success",
-		"data": gin.H{
-			"role": nil,
-			"id":   nil,
-		},
-	})
+	return
 }
 
 func CreateNewRequester(c *gin.Context) {
