@@ -114,8 +114,6 @@ func GetRequesterRequests(c *gin.Context) {
 		log.Fatalf("Error retrieving requests: %v\n", err)
 	}
 
-	fmt.Printf("Retrieved requests: %+v\n", requests)
-
 	// Set the Content-Type header and write the JSON response
 	c.JSON(http.StatusOK, gin.H{
 		"status": "success",
